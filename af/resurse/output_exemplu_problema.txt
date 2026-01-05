@@ -1,0 +1,3 @@
+element 1 pozitie: 0
+element 2 pozitie: 1
+element 3 pozitie: 2
