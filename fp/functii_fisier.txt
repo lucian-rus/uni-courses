@@ -1,0 +1,21 @@
+- ptr reprezinta output-ul lui `fopen` si e de tip `FILE *`
+
+* fopen   - deschide un fisier                                            -> fopen(nume, mod["w", "r", etc])
+* fclose  - inchide fisierul                                              -> fclose(ptr)
+* foef    - verifica daca s-a ajuns la eof                                -> foef(ptr)
+* fflush  - golire a buffer-ului in fisier                                -> fflush(ptr)
+* ferror  - verificare daca a aparut vreo eroare in decursul procesarii   -> ferror(ptr)
+* fgetc   - citeste un caracter                                           -> fgetc(ptr)
+* fputc   - scrie un caracter                                             -> fputc(c, ptr)
+* fgets   - citirea unui sir de caractere                                 -> fgets(sir, dim, ptr)
+* fputs   - scrie un string in fisier                                     -> fputs(sir, ptr)
+* fprintf - scrie formatata intr-un fisier                                -> fprint(ptr, ...)
+* fprintf - citire formatata dintr-un fisier                              -> fprint(ptr, ...)
+* fread   - citire in mod binar                                           -> fread(adr, num_bloc, lung_bloc, ptr)
+* fwrite  - scriere in mod binar                                          -> fwrite(adr, num_bloc, lung_bloc, ptr)
+* fseek   - functie pentru salt in fisier relativ la o pozitie            -> fseek(ptr, num, ptr)
+* ftell   - returneaza pozitia curent in fisier                           -> ftell(ptr)
+
+SEEK_SET
+SEEK_CUR
+SEEK_END

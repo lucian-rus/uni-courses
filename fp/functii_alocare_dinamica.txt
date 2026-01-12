@@ -1,0 +1,6 @@
+* malloc(block_size)                    -> malloc(5 * sizeof(int))
+* calloc(block_count, block_size)       -> calloc(5, sizeof(int))
+* realloc(target_pointer, block_size)   -> realloc(ptr, 10 * sizeof(int))
+* free(targer_pointer)                  -> free(ptr)
+
+- aditional, dangling pointers (un pointer al carui memorie a fost dealocat) se poate seta ca NULL pentru extra securitate
