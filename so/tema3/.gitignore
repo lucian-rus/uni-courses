@@ -1,0 +1,13 @@
+*.o
+*.output
+*.hole
+*.foo
+*.txt
+
+hole
+hole2
+seek
+seek2
+mycat
+mycat2
+fileflags

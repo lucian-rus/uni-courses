@@ -1,0 +1,396 @@
+\documentclass{article}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=[x86masm]Assembler,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+}
+
+\title{Laborator assembly}
+\author{Lucian Rus}
+\date{15.03.2026}
+
+\begin{document}
+
+\maketitle
+
+Problemele au fost rezolvate folosind aplicatie web \textbf{https://dosasm.com/}. Aplicatia permite compilarea codului \textbf{asm} fara a fi necesara descarcarea unui editor specific.
+
+Unele probleme au link-ul atasat sub forma de comentariu pe a doua linie a secventei de cod. Totodata, nu au fost incluse cerintele.
+
+\newpage
+\section*{1.asm}
+\begin{lstlisting}
+;https://dosasm.com/9Aq8Cj/
+
+.MODEL small
+.STACK 100h
+.DATA
+    MESSAGE1 db 'hello! ',13,10, '$'
+
+.CODE
+START:
+    mov ax,@data
+    mov ds,ax
+
+    mov ah,09h
+    lea dx,MESSAGE1
+    int 21h
+
+    mov ah,4ch
+    int 21h
+end START
+\end{lstlisting}
+
+\newpage
+\section*{2.asm}
+\begin{lstlisting}
+; cerinta laborator - problema 1
+; https://dosasm.com/BXkdXD/
+
+.MODEL small
+.STACK 100h
+.DATA
+    MESSAGE1 DB 'Introduceti un caracter: '
+    MESSAGE2 DB 'Numarul tau este: ' 
+    NEWLINE  DB  13,10, '$'
+
+.CODE
+START:
+    mov ax,@data
+    mov ds,ax
+
+    mov ah,09h
+    lea dx,MESSAGE1
+    int 21h
+    
+    mov ah,01h
+    int 21h
+    
+    mov ah,02h
+    mov dl,al
+    int 21h
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,09h
+    lea dx,MESSAGE2
+    int 21h
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,4ch
+    int 21h
+end START
+\end{lstlisting}
+\newpage
+\section*{3.asm}
+\begin{lstlisting}
+; cerinta laborator - problema 2
+;https://dosasm.com/arTbdK/
+
+.MODEL small
+.STACK 100h
+.DATA
+    MESSAGE1 DB 'Introduceti un numar:$'
+    MESSAGE2 DB 'Caracterul introdus de dumneavoastra +1 este:$' 
+    NEWLINE  DB  13,10, '$'
+
+.CODE
+START:
+    mov ax,@data
+    mov ds,ax
+
+    mov ah,09h
+    lea dx,MESSAGE1
+    int 21h
+    
+    mov ah,01h
+    int 21h
+    mov bl, al
+    
+    inc bl
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,09h
+    lea dx,MESSAGE2
+    int 21h
+    
+    mov dl,bl
+    mov ah,02h
+    int 21h
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,4ch
+    int 21h
+end START
+\end{lstlisting}
+\newpage
+\section*{4.asm}
+\begin{lstlisting}
+; cerinta laborator - problema 3
+;https://dosasm.com/YBY4AV/
+
+.MODEL small
+.STACK 100h
+.DATA
+    MESSAGE1 DB 'Introduceti un numar:$'
+    MESSAGE2 DB 'Caracterul introdus de dumneavoastra -1 este:$' 
+    NEWLINE  DB  13,10, '$'
+
+.CODE
+START:
+    mov ax,@data
+    mov ds,ax
+
+    mov ah,09h
+    lea dx,MESSAGE1
+    int 21h
+    
+    mov ah,01h
+    int 21h
+    mov bl, al
+    
+    dec bl
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,09h
+    lea dx,MESSAGE2
+    int 21h
+    
+    mov dl,bl
+    mov ah,02h
+    int 21h
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,4ch
+    int 21h
+end START
+\end{lstlisting}
+\newpage
+\section*{5.asm}
+\begin{lstlisting}
+; cerinta laborator - problema 4
+;https://dosasm.com/xsunHK/
+
+.MODEL small
+.STACK 100h
+.DATA
+    MESSAGE1 DB 'Introduceti un numar:$'
+    MESSAGE2 DB 'Caracterul introdus de dumneavoastra +1 este:$' 
+    MESSAGE3 DB 'Caracterul introdus de dumneavoastra -1 este:$' 
+    NEWLINE  DB  13,10, '$'
+    
+    SAVED     DB 0
+    SAVED_DEC DB 0
+    SAVED_INC DB 0
+.CODE
+START:
+    mov ax,@data
+    mov ds,ax
+
+    mov ah,09h
+    lea dx,MESSAGE1
+    int 21h
+    
+    mov ah,01h
+    int 21h
+    mov SAVED, al
+    
+    mov bl, SAVED
+    inc bl
+    mov SAVED_INC,bl
+    
+    mov bl, SAVED
+    dec bl
+    mov SAVED_DEC,bl
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,09h
+    lea dx,MESSAGE2
+    int 21h
+    
+    mov dl,SAVED_INC
+    mov ah,02h
+    int 21h
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+        mov ah,09h
+    lea dx,MESSAGE3
+    int 21h
+    
+    mov dl,SAVED_DEC
+    mov ah,02h
+    int 21h
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,4ch
+    int 21h
+end START
+\end{lstlisting}
+\newpage
+\section*{pb1.asm}
+\begin{lstlisting}
+; cerinta laborator - problema propusa 1
+; https://dosasm.com/BXkdXD/
+
+.MODEL small
+.STACK 100h
+.DATA
+    MESSAGE1 DB 'Introduceti numarul 1: $'
+    MESSAGE2 DB 'Introduceti numarul 2: $'
+    MESSAGE3 DB 'Suma:'
+    NEWLINE  DB  13,10, '$'
+
+    NUMA DB 0
+    NUMB DB 0
+    SUMA DB 0
+.CODE
+START:
+    mov ax,@data
+    mov ds,ax
+
+    mov ah,09h
+    lea dx,MESSAGE1
+    int 21h
+    
+    mov ah,01h
+    int 21h
+    sub al,30h
+    mov NUMA, al
+    
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,09h
+    lea dx,MESSAGE2
+    int 21h
+    
+    mov ah,01h
+    int 21h
+    sub al,30h
+    mov NUMB, al
+
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,09h
+    lea dx,MESSAGE3
+    int 21h
+     
+    mov bl,0
+    add bl,NUMA
+    add bl,NUMB
+    add bl,'0'
+    
+    mov SUMA,bl
+    
+    mov dl,SUMA
+    mov ah,02h
+    int 21h
+   
+    mov ah,09h
+    lea dx,NEWLINE
+    int 21h
+    
+    mov ah,4ch
+    int 21h
+end START
+\end{lstlisting}
+\newpage
+\section*{pb2.asm}
+\begin{lstlisting}
+; cerinta laborator - problema propusa 4
+
+.MODEL small
+.STACK 100h
+.DATA
+    msg    db 'Introduceti numarul: $'
+    newline db 13,10,'$'
+.CODE
+Start:
+    mov ax, @data
+    mov ds, ax
+
+    lea dx, msg
+    mov ah, 09h
+    int 21h
+
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    mov ch, al
+    mov cl, al
+
+Loop_lines:
+    cmp cl, 0
+    je  Done
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    mov bl, ch
+
+Loop_columns:
+    cmp bl, 0
+    je  Endline
+
+    mov dl, '*'
+    mov ah, 02h
+    int 21h
+
+    dec bl
+    jmp Loop_columns
+
+Endline:
+    dec cl
+    jmp Loop_lines
+
+Done:
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+    mov ah, 4Ch
+    int 21h
+END Start
+\end{lstlisting}
+
+\end{document}

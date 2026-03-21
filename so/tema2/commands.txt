@@ -1,0 +1,45 @@
+echo ceva > file.txt 
+
+cat file.txt 
+
+cat file.txt | gzip > file.txt.gz 
+
+zcat file.txt.gz 
+
+cat < file.txt 
+
+cat file.txt 
+
+echo "linia 2" >> file.txt 
+
+cat file.txt 
+
+echo -n "linia 3" >> file.txt 
+
+echo "continuare" >> file.txt 
+
+echo "linia 4" >> file.txt 
+
+cat file.txt 
+
+tar -cvf extra.tar extra/
+
+tar -xf extra.tar -C dup
+
+ls -lR dup/
+
+tar -c extra/ | gzip > extra.tgz
+
+gunzip -c extra.tgz | tar -x -C dup/
+
+tar -zcf extra.tar.gz extra/
+
+tar -zxf extra.tar.gz -C dup/
+
+zip -r extra.zip extra/*
+
+unzip extra.zip
+
+ls -l
+
+find / -name "*.h" | sed ’s/\(.*\)\/.*/\1/’ | sort | uniq

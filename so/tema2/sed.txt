@@ -1,0 +1,10 @@
+cat file.txt
+sed 's/on/off/' file.txt
+sed 's/on /off /' file.txt
+sed 's/on /off /g' file.txt
+sed 's/on /off /gi' file.txt
+sed 's/here/(&)/g' file.txt
+sed 's/\([a-zA-Z0-9][a-zA-Z0-9]*\) \([a-zA-Z0-9][a-zA-Z0-9]*\)/\2 \1/' file.txt
+sed 's/\([^ ][^ ]*\) \([^ ][^ ]*\)/\2 \1/' file.txt
+sed -i 's/\([^ ][^ ]*\) \([^ ][^ ]*\)/\2 \1/' file.txt
+find / -name "*.h" | sed 's/\(.*\)\/.*/\1/' | sort | uniq
