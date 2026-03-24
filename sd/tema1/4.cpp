@@ -7,36 +7,84 @@ typedef struct _Fractie {
     int numitor;
     int numarator;
 
-    void reductie(void) {
+    int cmmdc(int a, int b) {
+        if (a == 0) {
+            return b;
+        }
+        if (b == 0) {
+            return a;
+        }
 
+        while (a != b) {
+            if (a > b) {
+                a = a - b;
+            }
+            else {
+                b = b - a;
+            }
+        }
+        return a;
+    }
+
+    void reductie(void) {
+        if (numitor == 0) {
+            return;
+        }
+
+        int divizor = cmmdc(numarator, numitor);
+
+        numarator /= divizor;
+        numitor /= divizor;
     };
 
-    float aduna(struct _Fractie f) {
+    void aduna(struct _Fractie f) {
+        numarator = numarator * f.numitor + f.numarator * numitor;
+        numitor   = numitor * f.numitor;
     }
 
-    float scade(struct _Fractie f) {
+    void scade(struct _Fractie f) {
+        numarator = numarator * f.numitor - f.numarator * numitor;
+        numitor   = numitor * f.numitor;
     }
-
-    float inmulteste(struct _Fractie f) {
+    void inmulteste(struct _Fractie f) {
         numarator *= f.numarator;
         numitor *= f.numitor;
     }
 
-    float imparte(struct _Fractie f) {
-        numarator *= f.numitor;
-        numitor *= f.numarator;
+    void imparte(struct _Fractie f) {
+        if (f.numarator != 0) {
+            numarator *= f.numitor;
+            numitor *= f.numarator;
+        }
     }
 
     float compara(struct _Fractie f) {
+        return tofloat() - f.tofloat();
     }
 
     float tofloat(void) {
-        return (float)((float)numarator / (float)numitor);
+        if (numitor == 0) {
+            return 0;
+        }
+        return (float)numarator / (float)numitor;
     };
+
+    void print(void) {
+        std::cout << numarator << '/' << numitor << '\n';
+    }
+
+    void citire(void) {
+        std::ifstream fin("sd/input/fractii.txt");
+        fin >> numarator >> numitor;
+        fin.close();
+    }
+
 } Fractie_t;
 
+// nu folosim functia built-in de citire pentru ca ar fi inafara scopului problemei sa facem
+// tratarea inaintarii citirii in fisier
 void citire_fractii(std::vector<Fractie_t> &fractii) {
-    std::ifstream fin("fractii.txt");
+    std::ifstream fin("sd/input/fractii.txt");
 
     int numarator;
     int numitor;
@@ -68,9 +116,26 @@ int main() {
     citire_fractii(fractii);
     afisare_fractii(fractii);
 
-    // sortare eficienta
+    for(Fractie_t &f: fractii) {
+        f.reductie();
+    }
+    afisare_fractii(fractii);
+
     std::sort(fractii.begin(), fractii.end(), [](Fractie_t &f1, Fractie_t &f2) { return ((f1.tofloat() - f2.tofloat()) > 0); });
     afisare_fractii(fractii);
+
+    // Fractie_t f;
+    // f.numarator = 10;
+    // f.numitor   = 3;
+
+    // Fractie_t f1;
+    // f1.numarator = 3;
+    // f1.numitor   = 6;
+
+    // f.aduna(f1);
+    // f.scade(f1);
+    // f.reductie();
+    // std::cout << f.numarator << '/' << f.numitor << '\n';
 
     return 0;
 }

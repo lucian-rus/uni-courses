@@ -48,6 +48,7 @@ int main() {
 
             int north, south, west, east;
 
+            // notatie elvis pentru mai putin cod
             west  = (j == 0) ? 0 : mat[i][j - 1];
             east  = (j == width - 1) ? 0 : mat[i][j + 1];
             north = (i == 0) ? 0 : mat[i - 1][j];
