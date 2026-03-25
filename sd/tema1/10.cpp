@@ -59,6 +59,8 @@ void citeste_expresii_din_fisier(std::vector<std::string> &expresii) {
 
     fin.close();
 }
+
+// incomplet -> trateaza `+++` ca fiind valid
 void determinare_rpn(std::string linie) {
     std::stack<char>  op_stack;
     std::vector<char> polish;
