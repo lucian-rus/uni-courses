@@ -3,7 +3,7 @@
 #include <vector>
 
 void citire_vector(std::vector<std::vector<int>> &mat, int &height, int &width) {
-    std::ifstream fin("teren.txt");
+    std::ifstream fin("sd/input/teren.txt");
 
     fin >> height >> width;
     // citeste elementele vectorului

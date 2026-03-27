@@ -7,7 +7,7 @@
 void citire_puncte(std::vector<std::pair<int, int>> &puncte) {
     int x, y;
 
-    std::ifstream fin("puncte.txt");
+    std::ifstream fin("sd/input/puncte.txt");
     while (fin >> x >> y) {
         std::pair<int, int> aux(x, y);
         puncte.push_back(aux);

@@ -5,7 +5,7 @@
 #include <vector>
 
 void citire_intervale(std::vector<std::pair<int, int>> &intervale) {
-    std::ifstream fin("intervale.txt");
+    std::ifstream fin("sd/input/intervale.txt");
 
     int first, second;
     while (fin >> first >> second) {
