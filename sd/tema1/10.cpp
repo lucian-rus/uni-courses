@@ -107,7 +107,6 @@ float calculeaza_rpn(const std::vector<std::string> &polish) {
     return stiva.top();
 }
 
-// incomplet -> trateaza `+++` ca fiind valid
 void determinare_rpn(std::string linie) {
     // string ca sa putem stoca mai multe caractere -> ne ajuta cu formare de numere
     std::stack<char>         op_stack;
