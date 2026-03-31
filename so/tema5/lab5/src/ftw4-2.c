@@ -41,73 +41,95 @@ int main(int argc, char *argv[]) {
  * The caller's func() is called for every file.
  */
 
-#define FTW_F   1 /* file other than directory */
-#define FTW_D   2 /* directory */
-#define FTW_DNR 3 /* directory that can't be read */
-#define FTW_NS  4 /* file that we can't stat */
+#define FTW_F    1 /* file other than directory */
+#define FTW_D    2 /* directory */
+#define FTW_DNR  3 /* directory that can't be read */
+#define FTW_NS   4 /* file that we can't stat */
+#define FTW_NPWD 5 /* eroare aditionala pentru pwd error */
 
 static char *fullpath; /* contains full pathname for every file */
 
 static int myftw(char *pathname, Myfunc *func) {
-    fullpath = path_alloc(NULL); /* malloc's for PATH_MAX+1 bytes */
-    strcpy(fullpath, pathname);  /* initialize fullpath */
 
+    // fullpath = path_alloc(NULL);	/* malloc's for PATH_MAX+1 bytes */
+    // strcpy(fullpath, pathname);	/* initialize fullpath */
+
+    // pornim de la sursa
+    if (chdir(pathname) < 0) {
+        err_ret("error chdir %s", pathname);
+        return -1;
+    }
     return dopath(func);
 }
-
-/*
- * Descend through the hierarchy, starting at "fullpath".
- * If "fullpath" is anything other than a directory, we lstat() it,
- * call func(), and return.  For a directory, we call ourself
- * recursively for each name in the directory.
- */
 static int dopath(Myfunc *func) {
     struct stat    statbuf;
     struct dirent *dirp;
     DIR           *dp;
-    int            ret;
+    int            ret = 0;
     char          *ptr;
 
-    if (lstat(fullpath, &statbuf) < 0)
-        return func(fullpath, &statbuf, FTW_NS); /* stat error */
+    // luam directorul curent
+    char curr[256] = {0};
+    if (getcwd(curr, 256) == NULL) {
+        printf("eroare la deschidere\n");
+        return func(curr, &statbuf, FTW_NS);
+    }
+
+    // printf("current: %s\n", curr);
+
+    if (lstat(curr, &statbuf) < 0)
+        return func(curr, &statbuf, FTW_NS); /* stat error */
 
     if (S_ISDIR(statbuf.st_mode) == 0)
-        return func(fullpath, &statbuf, FTW_F); /* not a directory */
+        return func(curr, &statbuf, FTW_F); /* not a directory */
 
     /*
      * It's a directory.  First call func() for the directory,
      * then process each filename in the directory.
      */
 
-    if ((ret = func(fullpath, &statbuf, FTW_D)) != 0)
+    if ((ret = func(curr, &statbuf, FTW_D)) != 0)
         return ret;
 
-    chdir(fullpath);
+    // ptr = fullpath + strlen(fullpath);	/* point to end of fullpath */
+    // *ptr++ = '/';
+    // *ptr = 0;
 
-    ptr    = fullpath + strlen(fullpath); /* point to end of fullpath */
-    *ptr++ = '/';
-    *ptr   = 0;
-
-    printf("%s\n", fullpath);
-    if ((dp = opendir(fullpath)) == NULL)
-        return func(fullpath, &statbuf, FTW_DNR);
+    if ((dp = opendir(curr)) == NULL)
+        return func(curr, &statbuf, FTW_DNR);
 
     while ((dirp = readdir(dp)) != NULL) {
         if (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
             continue; /* ignore dot and dot-dot */
 
-        strcpy(ptr, dirp->d_name); /* append name after slash */
+        // strcpy(ptr, dirp->d_name);	/* append name after slash */
 
-        if ((ret = dopath(func)) != 0) /* recursive */
-            break;                     /* time to leave */
+        struct stat entry;
+        if (lstat(dirp->d_name, &entry) < 0)
+            continue;
+
+        // cum folosim chdir, trebuie sa ne asiguram ca ne intoarcem corect
+        if (S_ISDIR(entry.st_mode)) {
+            if (chdir(dirp->d_name) == 0) {
+                if ((ret = dopath(func)) != 0) { /* recursive */
+                    chdir("..");
+                    break; /* time to leave */
+                }
+                chdir("..");
+            }
+        }
+        else {
+            if ((ret = func(dirp->d_name, &entry, FTW_F)) != 0)
+                break;
+        }
     }
 
-    ptr[-1] = 0; /* erase everything from slash onwards */
+    // ptr[-1] = 0;	/* erase everything from slash onwards */
 
     if (closedir(dp) < 0)
-        err_ret("can't close directory %s", fullpath);
+        err_ret("can't close directory %s", curr);
 
-    return (ret);
+    return ret;
 }
 
 static int myfunc(const char *pathname, const struct stat *statptr, int type) {
@@ -148,6 +170,10 @@ static int myfunc(const char *pathname, const struct stat *statptr, int type) {
 
         case FTW_NS:
             err_ret("stat error for %s", pathname);
+            break;
+
+        case FTW_NPWD:
+            err_ret("could not get pwd %s", pathname);
             break;
 
         default:
