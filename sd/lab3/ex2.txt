@@ -1,0 +1,13 @@
+4
+Maraton 3
+Popescu Ion 25
+Ionescu Maria 22
+Vasile Andrei 30
+Inot 2 
+Popescu Ion 25
+Radu Mihai 28
+Ciclism 2
+Ionescu Maria 22
+Popescu Ion 25
+Tenis 1
+Dumitrescu Elena 26

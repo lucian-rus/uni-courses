@@ -1,0 +1,11 @@
+./fork1
+./fork1 > temp.out
+cat temp.out
+
+./wait1
+./fork2
+
+./tellwait1
+./tellwait2
+
+./exec1

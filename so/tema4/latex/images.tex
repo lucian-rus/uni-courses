@@ -1,0 +1,105 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{float}
+
+\title{Laborator 3 - SO}
+\author{Rus Lucian-Florin}
+\date{March 20, 2026}
+
+\begin{document}
+
+\maketitle
+
+
+\newpage
+\section*{Comenzi laborator}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{1.png}
+\end{figure}
+
+\newpage
+\section*{Teme}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{2.png}
+    \caption{Exemplificare a alterarii fisierului Makefile - build \textbf{seek2}}
+\end{figure}
+
+Pentru a face build diferitelor programe cerute in tema, a fost nevoie de alterarea Makefile-ului. Au fost adaugate reguli pentru urmatoarele programe:
+\begin{itemize}
+  \item seek2 - necesar rezolvarii exercitiului 2
+  \item hole2 - necesar rezolvarii exercitiului 3
+  \item mycat2 - necesar rezolvarii exercitiului 3
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{3.png}
+    \caption{Implementare \textbf{seek2}}
+\end{figure}
+
+\textbf{seek2} deschide un fisier text cu flag-urile read-write si append. Functia \textbf{read} poate citi orice caracter din fisier, prin intermediul cursorului pe care il mutam cu \textbf{lseek}. Datele existente din fisier nu pot fi suprascrise, comportament dat de flag-ul \textbf{append}. Acest flag determina ca functia \textbf{write} sa adauge orice caracter la finalul fisierului.
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{6.png}
+    \caption{Implementare \textbf{hole2}}
+\end{figure}
+
+Implementarea \textbf{hole2} ne ajuta sa cream un fisier text cu doua "gauri". Pentru implementare ne folosim de:
+\begin{itemize}
+  \item creat - pentru a creea un fisier
+  \item write - pentru a scrie un buffer in fisier
+  \item lseek - pentru a muta cursorul
+\end{itemize}
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{4.png}
+    \caption{Implementare \textbf{mycat2}}
+\end{figure}
+
+Implementarea \textbf{mycat2} ne inlatura "gaurile" prezente in fisierele generate de \textbf{hole} si \textbf{hole2}. Programul parcurge intregul continut al fisierului, saring peste toate caracterele nule, caracterele valide urmand sa fie scrise.
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{5.png}
+    \caption{Rezultatele rularii programelor \textbf{mycat} si \textbf{mycat2}}
+\end{figure}
+
+Dupa generarea unui fisier cu doua "gauri", putem observa, atat cu ajutorul utilitarului \textbf{od} cat si cu ajutorul programului \textbf{mycat}, ca avem un numar mare de elemente nule. A fost aleasa reprezentarea in hexadecimal. Totodata, se poate observa ca folosirea programului \textbf{mycat2} ne scapa de aceste "gauri", caracterele nule fiind eliminate.
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{7.png}
+    \caption{Rezultatele rularii programului \textbf{fileflags} in urma unei alterari minimale menite sa ajute la intelegerea acestuia}
+\end{figure}
+
+\begin{itemize}
+  \item primul exemplu redirectioneaza descriptorul \textbf{2} catre fisierul \textbf{temp.foo} in modul append
+  \item al doilea exemplu deschide fisierul \textbf{temp.foo} in modul read-write si ii asociaza descriptorul \textbf{5}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{8.png}
+    \caption{Comenzi asemanatoare rulate}
+\end{figure}
+
+Alte exemple de utilizare ale utilitarului:
+
+\begin{itemize}
+  \item \textbf{\verb|./fileflags 0 < temp.foo} - citire simpla din fisier
+  \item \textbf{\verb|./fileflags 3 3>> temp.foo} - append cu descriptor custom
+  \item \textbf{\verb|./fileflags 1 > temp.foo} - redirectionare simpla in fisier
+  \item \textbf{\verb|./fileflags 2 2<> temp.foo} - read-write pe descriptorul standard de eroare
+\end{itemize}
+
+\end{document}

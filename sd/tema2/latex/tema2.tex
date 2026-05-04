@@ -1,0 +1,624 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tocloft}
+\usepackage[hidelinks]{hyperref}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=tb
+}
+
+\title{Tema structuri de date}
+\author{Lucian-Florin Rus}
+\date{01.05.2026}
+
+\begin{document}
+
+\maketitle
+
+\renewcommand{\cftdot}{.}
+\tableofcontents 
+
+\subsection{Note}
+\begin{itemize}
+    \item formatarea poate fi inconsistenta deoarece s-a folosit \textit{.clang-format} pentru un width maxim de 120 de caractere
+    \item codul sursa pentru toate problemele se poate gasi pe github \textbf{\hyperlink{https://github.com/lucian-rus/uni-courses/tree/main/sd/tema1}{lucian-rus/uni-courses}}
+    \item problemele au fost rezolvate respectand, in mare, regulile de scriere modulara a codului, dar vor fi incosistente prezente atat in nomenclatura cat si in calitatea comentariilor
+\end{itemize}
+
+\newpage
+\subsection{Problema 3}
+Se consideră un vector de caractere (citit din fişier). Să se scrie o funcţie care are ca parametru acest şir şi care returnează un palindrom format cu toate caracterele şirului, dacă acest lucru este posibil sau un şir vid altfel. Implementaţi eficient folosind \textbf{unordered\textunderscore map} din stl.
+\textbf{(2.5p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+// se putea face mai optim daca citeam caracterele direct intr-un map file
+void citire_din_fisier(std::vector<char> &cuvant) {
+    std::ifstream fin("sd/input/cuvant.txt");
+
+    char c;
+    while (fin >> c) {
+        cuvant.push_back(c);
+    }
+
+    fin.close();
+}
+
+// din cauza constrangerilor din cerinta, optam pentru o solutie mai putin optima
+// si construim map-ul in interiorul functiei
+std::string palindrom(const std::vector<char> &cuvant) {
+    std::unordered_map<char, int> map;
+
+    std::string palindrom = "";
+    for (char c : cuvant) {
+        map[c]++;
+    }
+
+    bool singur_multiplu = false;
+    char singur;
+    for (auto it = map.begin(); it != map.end(); it++) {
+        // daca avem un nr impar de litere -> iesim cu probleme
+        if (it->second % 2 == 1) {
+            // tratam cazul in care avem o singura litera care nu are pereche -> caz valid de palindrom
+            if (singur_multiplu == false) {
+                singur          = it->first;
+                singur_multiplu = true;
+            }
+            else {
+                return "";
+            }
+        }
+
+        // >1 pentru a trata cazul cu singur caracter ramas valid
+        while (it->second > 1) {
+            palindrom += it->first;
+            palindrom = it->first + palindrom;
+
+            it->second = it->second - 2;
+        }
+    }
+
+    // daca avem un singur element, il bagam la jumatatea cuvantului
+    if (singur_multiplu == true) {
+        palindrom.insert(palindrom.size() / 2, 1, singur);
+    }
+
+    return palindrom;
+}
+
+int main(void) {
+    std::vector<char> cuvant;
+    citire_din_fisier(cuvant);
+
+    std::cout << "am citit: ";
+    for (char c : cuvant) {
+        std::cout << c;
+    }
+
+    std::cout << '\n';
+
+    // tattt  - valid
+    // tattta - valid
+    // ttt    - valid
+    // hello  - invalid
+    std::string plndrm = palindrom(cuvant);
+    if (plndrm != "") {
+        std::cout << "palindrom: " << plndrm << '\n';
+    }
+    else {
+        std::cout << "nu este palindrom!\n";
+    }
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 4}
+Se consideră două şiruri de caractere (citite din fişier). Să se scrie o funcţie care are ca parametru cele două şiruri şi care returnează \textbf{true} dacă al doilea este o permutare a primului şi \textit{false} altfel. Implementaţi folosind \textbf{unordered\textunderscore set} din stl.
+\textbf{(1.5p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <unordered_set>
+
+void citire_din_fisier(std::string &s1, std::string &s2) {
+    std::ifstream fin("sd/input/cuvinte.txt");
+
+    fin >> s1 >> s2;
+
+    fin.close();
+}
+
+// din moment ce avem de folosit `unordered_set`, avem o limitare. 
+// cuvintele folosite pot sa aiba doar caractere unice, de ex. `abc` si `abcd`
+// `abc` si `abcc` vor fi considerate permutari. pentru a rezolva situatia, ar trebui sa folosim un `unordered_map`
+// dar daca il folosim, nu mai are rost folosirea `unordered_set`-ului
+bool permutare(const std::string &s1, const std::string &s2) {
+    std::unordered_set<char> set;
+
+    // construim set-ul in baza primului cuvant
+    for(char c: s1) {
+        set.insert(c);
+    }
+
+    // verificam daca toate caracterele se regasesc in set. daca nu, returnam false
+    for(char c: s2) {
+        if(set.find(c) == set.end()) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int main(void) {
+    std::string s1, s2;
+    citire_din_fisier(s1, s2);
+    std::cout << "am citit " << s1 << " si " << s2 << '\n';
+
+    std::cout << (permutare(s1, s2) ? "este permutare\n" : "nu este permutare\n");
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 5}
+Se consideră un număr de competiţii sportive la care s-au inscris concurenţi. Pentru fiecare competiţie există o listă cu numele şi prenumele concurenţilor (pereche de valori de tip std::string). Aceste liste se citesc dintr-un fişier. Să se scrie o funcţie care indică persoanele care participă la mai mult de o singură competiţie
+\textbf{(2p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <vector>
+
+using Concurent  = std::pair<std::string, std::string>;
+using Competitie = std::pair<std::string, std::vector<Concurent>>;
+
+// fara custom hash avem eroare -> puteam scapa de asta cu un map simplu
+struct ConcurentHash {
+    size_t operator()(const Concurent &p) const {
+        return std::hash<std::string>()(p.first) ^ (std::hash<std::string>()(p.second) << 1);
+    }
+};
+
+void citire_din_fisier(std::vector<Competitie> &c) {
+    std::ifstream fin("sd/input/competitii.txt");
+
+    std::string tip_competitie;
+    int         nr_candidati;
+
+    // formam listele cat mai coerent aici
+    while (fin >> tip_competitie >> nr_candidati) {
+        Competitie comp;
+        comp.first = tip_competitie;
+        for (int i = 0; i < nr_candidati; i++) {
+            Concurent conc;
+            fin >> conc.first >> conc.second;
+
+            comp.second.push_back(conc);
+        }
+        c.push_back(comp);
+    }
+
+    fin.close();
+}
+
+void listare_persoane_competitii_multiple(const std::vector<Competitie> &c) {
+    std::unordered_map<Concurent, int, ConcurentHash> concurenti;
+
+    for (auto comp : c) {
+        for (auto conc : comp.second) {
+            concurenti[conc]++;
+        }
+    }
+
+    // mergem prin unordered_map si printam pe toti cei care au mai multe competitii
+    for (auto it = concurenti.begin(); it != concurenti.end(); it++) {
+        if (it->second > 1) {
+            Concurent c = it->first;
+            std::cout << c.first << ' ' << c.second << " participa la " << it->second << " competitii\n";
+        }
+    }
+}
+
+int main(void) {
+    std::vector<Competitie> lista_competitii;
+    citire_din_fisier(lista_competitii);
+
+    std::cout << "am citit:\n";
+    for (auto comp : lista_competitii) {
+        std::cout << comp.first << '\n';
+        for (auto conc : comp.second) {
+            std::cout << conc.first << ' ' << conc.second << '\n';
+        }
+        std::cout << '\n';
+    }
+
+    listare_persoane_competitii_multiple(lista_competitii);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 8}
+Se citeşte dintr-un fişier un număr de valori reale şi se stochează într-un vector. Să se determine în mod eficient, dacă există două numere egale în vector, aflate la o distanţă mai mică sau egală cu o valoare dată \textit{dist}. Puteţi folosi \textbf{unordered\textunderscore set} sau altă structură care permite rezolvare eficientă.
+\textbf{(2.5p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+
+void citire_din_fisier(std::vector<int> &v) {
+    std::ifstream fin("sd/input/duplicate.txt");
+
+    int num;
+    while (fin >> num) {
+        v.push_back(num);
+    }
+
+    fin.close();
+}
+
+bool distanta_maxima(const std::vector<int> &v, const int dist) {
+    std::unordered_map<int, int> map;
+
+    // mergem prin array
+    for (int i = 0; i < v.size(); i++) {
+        int capat = i + dist;
+        if (capat > v.size()) {
+            capat = v.size();
+        }
+
+        // formam "subsiruri" de max `dist` si adaugam elementele in map. daca avem mai mult de doua
+        // in orice moment, returnam true
+        for (int j = i; j < capat; j++) {
+            std::cout << v[j] << ' ';
+            map[v[j]]++;
+
+            if (map[v[j]] > 1) {
+                std::cout << '\n';
+                return true;
+            }
+        }
+
+        map.clear();
+        std::cout << '\n';
+    }
+
+    // daca ajungem pana aici, nu am gasit nimic
+    return false;
+}
+
+int main(void) {
+    std::vector<int> numere;
+    citire_din_fisier(numere);
+
+    bool val = distanta_maxima(numere, 4);
+    std::cout << "in distanta maxima: " << val << '\n';
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 9}
+ Se consideră \textit{nr\textunderscore mag} magazine. Fiecare are un număr de produse. Să se veifice care magazin are cele mai multe produse exclusive (nu apar decât în magazinul respectiv). Citiţi dintr-un fişier în câte un vector de \textbf{std::string} produsele pentru fiecare magazin. Afişaţi în final magazinul cu cele mai multe produse exclusive şi care sunt aceste produse.
+\textbf{(2.5p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+using Produse = std::vector<std::string>;
+
+void citire_din_fisier(std::vector<Produse> &lista_magazine) {
+    std::ifstream fin("sd/input/magazine.txt");
+
+    int nr_mag;
+    fin >> nr_mag;
+    while (nr_mag--) {
+        int         nr_prod;
+        Produse     lista_produse;
+        std::string aux;
+        fin >> nr_prod;
+        while (nr_prod--) {
+            fin >> aux;
+            lista_produse.push_back(aux);
+        }
+
+        lista_magazine.push_back(lista_produse);
+    }
+
+    fin.close();
+}
+
+void determinare_max_produse_unice(const std::vector<Produse> &lista_magazine) {
+    std::unordered_map<std::string, int> map;
+
+    // mergem de doua ori prin lista de produse a fiecarui magazin, o data pentru a creea map-ul
+    for (auto mag : lista_magazine) {
+        for (auto prod : mag) {
+            map[prod]++;
+            // std::cout << prod << ' ';
+        }
+        // std::cout << '\n';
+    }
+
+    int mag_max_prod       = -1;
+    int poz_magazin_cautat = -1;
+    // o data pentru a determina care magazin are cele mai multe produse unice
+    for (int i = 0; i < lista_magazine.size(); i++) {
+        int curr_cnt = 0;
+        // map
+        for (auto prod : lista_magazine[i]) {
+            if (map[prod] == 1) {
+                curr_cnt++;
+            }
+        }
+
+        std::cout << "nr prod unice pt " << i << ": " << curr_cnt << '\n';
+
+        if (curr_cnt > mag_max_prod) {
+            poz_magazin_cautat = i;
+            mag_max_prod       = curr_cnt;
+        }
+    }
+
+    // dam +1 ca sa fie mai "human readable"
+    std::cout << "magazinul cu cele mai multe produse unice este magazinul nr. " << poz_magazin_cautat + 1 << '\n';
+}
+
+int main(void) {
+    std::vector<Produse> lista_magazine;
+    citire_din_fisier(lista_magazine);
+
+    determinare_max_produse_unice(lista_magazine);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 10}
+Se consideră un şir de cuvinte citite dintr-un fişier. Scrieţi o funcţie, care să grupeze anagramele. Se consideră anagramă un cuvânt obţinut prin rearanjarea literelor altui cuvânt. Folosiţi structurile de date din stl învăţate, aşa încât să obţineţi eficienţa cea mai bună.
+\textbf{(2p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+void citire_fin_fisier(std::vector<std::string> &lista_cuv) {
+    std::ifstream fin("sd/input/anagrame.txt");
+
+    std::string aux;
+    while (fin >> aux) {
+        lista_cuv.push_back(aux);
+    }
+
+    fin.close();
+}
+
+// pentru cazul specific din exemplu, e suficient o functie de hashing minimala
+int hash_calculator(const std::string &s) {
+    int res_hash = 0;
+    // adunam codul char-ului la un total
+    for (char c : s) {
+        res_hash += c;
+    }
+
+    return res_hash;
+}
+
+void anagrame(const std::vector<std::string> &lista_cuv) {
+    // facem un map de liste de string in care retinem cuvintele
+    std::unordered_map<int, std::vector<std::string>> map;
+
+    for (auto cuv : lista_cuv) {
+        // int-ul e dat de o functie de hashing definita de noi
+        int key = hash_calculator(cuv);
+        map[key].push_back(cuv);
+    }
+
+    // listam anagramele
+    for (auto it = map.begin(); it != map.end(); it++) {
+        for (auto cuv : it->second) {
+            std::cout << cuv << ' ';
+        }
+        std::cout << '\n';
+    }
+}
+
+int main(void) {
+    std::vector<std::string> lista_cuv;
+    citire_fin_fisier(lista_cuv);
+    anagrame(lista_cuv);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 11}
+Se consideră un spaţiu bidimensional de dimensiune n*n ce conţine mai multe dreptunghiuri ale căror laturi nu se intersectează, dar pot fi dreptunghiuri în interiorul altor dreptunghiuri. Pentru fiecare dreptunghi se cunoaşte un cod unic şi coordonatele celor 4 vârfuri. Să de determine dreptunghiul cu cea mai mică arie în care se află un punct citit de la tastatură.
+\textbf{(2.5p)}\newline 
+
+\begin{lstlisting}
+#include <algorithm>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <tuple>
+
+using Dreptunghi = std::tuple<int, int, int, int>;
+
+// comparator custom care sa ne aranjeze dreptunghiurile in functie de arie
+struct CompCustom {
+    bool operator()(const Dreptunghi &a, const Dreptunghi &b) const {
+        // dreptunghi 1
+        int x11 = std::get<0>(a);
+        int y11 = std::get<1>(a);
+        int x12 = std::get<2>(a);
+        int y12 = std::get<3>(a);
+
+        // dreptunghi 2
+        int x21 = std::get<0>(b);
+        int y21 = std::get<1>(b);
+        int x22 = std::get<2>(b);
+        int y22 = std::get<3>(b);
+
+        int arie1 = std::abs(x12 - x11) * std::abs(y12 - y11);
+        int arie2 = std::abs(x22 - x21) * std::abs(y22 - y21);
+
+        return arie1 < arie2;
+    }
+};
+
+void citire_din_fisier(std::map<Dreptunghi, int, CompCustom> &lista_drept) {
+    std::ifstream fin("sd/input/dreptunghiuri.txt");
+
+    int x1, x2, y1, y2, id;
+    while (fin >> id >> x1 >> y1 >> x2 >> y2) {
+        lista_drept[Dreptunghi(x1, y1, x2, y2)] = id;
+    }
+
+    fin.close();
+}
+
+// verificam daca un punct e oriunde intr-un dreptunghi. lista e deja sortata
+void verifica_punct(const std::map<Dreptunghi, int, CompCustom> &lista_drept) {
+    int x, y;
+
+    std::cout << "introdu x: ";
+    std::cin >> x;
+    std::cout << "introdu y: ";
+    std::cin >> y;
+
+    for (auto it = lista_drept.begin(); it != lista_drept.end(); it++) {
+        int x1 = std::get<0>(it->first);
+        int y1 = std::get<1>(it->first);
+        int x2 = std::get<2>(it->first);
+        int y2 = std::get<3>(it->first);
+        // std::cout << "testing " << x1 << ' ' << y1 << ' ' << x2 << ' ' << y2 << '\n';
+        if (std::min(x1, x2) <= x && x <= std::max(x1, x2) && std::min(y1, y2) <= y && y <= std::max(y1, y2)) {
+            std::cout << "punctul intra in dreptunghiul cu id: " << it->second << '\n';
+            return;
+        }
+    }
+
+    std::cout << "punctul nu se gaseste in niciun dreptunghi!\n";
+}
+
+int main(void) {
+    // sortam automat pe baza custom comparatorului
+    // explicatie pentru care cheile sunt definite ca fiind coordonatele si nu id-ul se gaseste si la pb12 (situatie similara)
+    std::map<Dreptunghi, int, CompCustom> lista_drept;
+    citire_din_fisier(lista_drept);
+
+    verifica_punct(lista_drept);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\subsection{Problema 12}
+In cadrul pasului de admitere la facultate s-au înscris mai mulţi absolvenţi de liceu, pentru fiecare persoană cunoscându-se media de admitere, nota de la bacalureat şi nume acesteia. Să se afişeze o listă ce conţine(în ordine aleatoare) primele n persoane(n - citit de la tastatură) care au fost acceptate în cadrul facultăţii. Ordinea canditaţilor este realizată pe baza mediei de admitere, iar la caz de medii egale departajarea va fi realizată pe baza notei obţinute la examenul de bacalaureat.
+\textbf{(3p)}\newline
+
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <tuple>
+#include <vector>
+
+// std::map e un ordered map la care putem da un custom comparator ca sa ne faca automat sortarea
+struct CompCustom {
+    bool operator()(const std::pair<float, float> &a, const std::pair<float, float> &b) const {
+        // departajarea in functie de nota de la bac
+        if (a.first == b.first) {
+            return a.second > b.second;
+        }
+
+        return a.first > b.first;
+    }
+};
+
+void citire_din_fisier(std::map<std::pair<float, float>, std::string, CompCustom> &lista_candidati) {
+    std::ifstream fin("sd/input/admitere.txt");
+
+    float       admitere, bac;
+    std::string nume;
+
+    // facem asta pentru ca desi pare neintuitiv, putem face custom comparison doar pe keys
+    while (fin >> nume >> admitere >> bac) {
+        lista_candidati[std::pair<float, float>(admitere, bac)] = nume;
+    }
+
+    fin.close();
+}
+
+void afisare(const std::map<std::pair<float, float>, std::string, CompCustom> &lista_candidati) {
+    int n;
+    std::cout << "numar de candidati sa fie afisati: ";
+    std::cin >> n;
+
+    // avem doua conditii pentru care iesim, sau ajungem la final de map sau consumam numarul cerut
+    for (auto it = lista_candidati.begin(); n && it != lista_candidati.end(); it++) {
+        std::cout << it->second << " cu notele: " << it->first.first << ' ' << it->first.second << '\n';
+        n--;
+    }
+}
+
+int main(void) {
+    // implementarea initiala avea:
+    // * key = string
+    // * val = pair<float, float>
+    // din cauza a cum functioneaza custom comparator, facand comparatii pe keys, a trebuit sa schimbam ordinea
+    std::map<std::pair<float, float>, std::string, CompCustom> lista_candidati;
+    citire_din_fisier(lista_candidati);
+    afisare(lista_candidati);
+
+    return 0;
+}
+\end{lstlisting}
+
+\end{document}

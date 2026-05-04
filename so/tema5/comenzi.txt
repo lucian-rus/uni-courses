@@ -1,0 +1,26 @@
+make lib
+make
+
+df /home
+cp ftw4.c tempfile
+df /home
+echo mini >tempfile
+df /home
+./unlink
+df /home
+
+cp unlink tempfile
+ls -l tempfile
+ls -lu tempfile
+date
+./zap tempfile
+ls -l tempfile
+ls -lu tempfile
+ls -lc tempfile
+
+./ftw4 /usr
+
+./cdpwd
+ls -l /var/spool
+
+./devrdev / /dev/sr0 /dev/tty

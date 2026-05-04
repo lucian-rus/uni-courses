@@ -1,0 +1,1339 @@
+\documentclass[12pt]{book}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=tb
+}
+
+\title{Tema 1 - Structuri de Date}
+\author{Lucian-Florin Rus}
+\date{16.04.2026}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problema 1}
+Se consideră un vector \textit{V} cu \textit{nr} elemente numere naturale. Să se construiască un al doilea vector\textit{ W} , care conţine fiecare element din \textit{V}, care are în componenţă doar cifre impare, duplicându-le. \textbf{(1p)}\newline
+
+\begin{lstlisting}
+#include <iostream>
+#include <vector>
+
+bool contine_cifre_pare(int num) {
+    // daca nr e par, returneaza direct
+    if ((num % 2) == 0) {
+        return true;
+    }
+
+    // iteram sa vedem daca gasim cifre pare
+    while (num != 0) {
+        if (num % 2 == 0) {
+            return true;
+        }
+
+        num /= 10;
+    }
+
+    return false;
+}
+
+// functie care genereaza un vector nou
+std::vector<int> genereaza_vector_nou(const std::vector<int> &v) {
+    std::vector<int> w;
+
+    for (int item : v) {
+        if (contine_cifre_pare(item) == true) {
+            continue;
+        }
+
+        w.push_back(item);
+        w.push_back(item);
+    }
+
+    return w;
+}
+
+void printeaza_vector(const std::vector<int> &v) {
+    for (int item : v) {
+        std::cout << item << ' ';
+    }
+    std::cout << '\n';
+}
+
+int main() {
+    std::vector<int> v = {1, 2, 5, 13, 27, 22, 3, 14, 41, 57};
+    printeaza_vector(v);
+    std::vector<int> w = genereaza_vector_nou(v);
+    printeaza_vector(w);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 3}
+
+Se dă un şir de paranteze deschise şi închise de tip (,), [, ], \{, \}. Să se verifice dacă şirul este corect. Folosiţi o stiva (std::stack) pentru rezolvare. \textbf{(1.5p)}\newline
+\begin{lstlisting}
+#include <iostream>
+#include <stack>
+#include <string>
+#include <vector>
+
+// exemple:
+// ()[]{[()]}       - valid
+// [()()]           - valid
+// ([])             - invalid 
+// [{}()]           - invalid
+// ()[{}]{[()]}     - invalid
+
+int main() {
+    bool valid = true;
+
+    // improvizatie -> folosim doi vectori cu rol de "map", pentru a putea respecta precedenta parantezelor {[()]}
+    // ca sa nu folosim un map conventional sau array-uri alocate static, folosim un vector al carui size ne
+    // va da numarul de paranteze rotunde sau patrate deschise la orice moment dat.
+    // nu stocam numarul de acolade deschise deoarece nu avem nevoie, acolada avand cea mai mare precedenta
+    std::vector<char> rotunda;
+    std::vector<char> patrata;
+
+    std::stack<char> paranteze;
+
+    std::string input = "()[{}]{[()]}";
+    for (char c : input) {
+        // verificam precedenta in momentul adaugarii in stiva
+        // daca precedenta e incalcata, ne oprim aici
+        // daca precedenta nu e incalcata, incrementam size-ul vectorului, in functie de tipul de paranteza
+        if (c == '(') {
+            paranteze.push(c);
+            rotunda.push_back(c);
+            continue;
+        }
+
+        if (c == '[') {
+            if (rotunda.size() != 0) {
+                valid = false;
+                break;
+            }
+
+            paranteze.push(c);
+            patrata.push_back(c);
+            continue;
+        }
+
+        if (c == '{') {
+            if (patrata.size() != 0) {
+                valid = false;
+                break;
+            }
+            paranteze.push(c);
+            continue;
+        }
+
+        // daca trecem de faza de adaugare, putem sa dam pop
+
+        // daca size-ul stivei e deja 0, oprim si iesim
+        if (paranteze.size() == 0) {
+            valid = false;
+            break;
+        }
+
+        // verificam elementul cel mai de sus din stiva potriveste cu elementul curent
+        // tratam si precedenta
+        if (c == ')' && paranteze.top() == '(') {
+            paranteze.pop();
+            rotunda.pop_back();
+        }
+        else if (c == ']' && paranteze.top() == '[') {
+            paranteze.pop();
+            patrata.pop_back();
+        }
+        else if (c == '}' && paranteze.top() == '{') {
+            paranteze.pop();
+        }
+        else {
+            valid = false;
+            break;
+        }
+    }
+
+    if (valid == false || paranteze.size() != 0) {
+        std::cout << "setul de paranteze NU este valid\n";
+    }
+    else {
+        std::cout << "setul de paranteze este valid\n";
+    }
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 4}
+Se consideră o structură fractie, cu câmpurile de tip int \textit{numarator} şi \textit{numitor}. Această structură dispune de o metodă \textit{reductie}, care reduce fracţia (ex: 12/30 devine 2/5), de funcţii pentru operaţii aritmetice, de funcţii de comparare. De asemenea o funcţie de transformare în număr zecimal (ex: 2/5 = 0.4). Să se se citească un vector de fracţii. Fiecare dintre acestea să se reducă. Să se sorteze vectorul cât mai eficient şi să se calculeze suma elementelor sale. Scrieţi funcţii de citire/ afişare pentru fracţii. \textbf{(2p)} \newline
+\begin{lstlisting}
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+typedef struct _Fractie {
+    int numitor;
+    int numarator;
+
+    int cmmdc(int a, int b) {
+        if (a == 0) {
+            return b;
+        }
+        if (b == 0) {
+            return a;
+        }
+
+        while (a != b) {
+            if (a > b) {
+                a = a - b;
+            }
+            else {
+                b = b - a;
+            }
+        }
+        return a;
+    }
+
+    void reductie(void) {
+        if (numitor =Eliminarea parantezelor redundante. Se citeşte dintr-un fişier un şir de
+caractere reprezentând o expresie aritmetică formată din numere, operatori (+,
+- /, *), litere (reprezentând variabile), paranteze rotunde, eventual spaţii albe.
+Se cere eliminarea parantezelor redundante, utilizând o adaptare a algoritmului
+de la forma poloneză. (5p)= 0) {
+            return;
+        }
+
+        int divizor = cmmdc(numarator, numitor);
+
+        numarator /= divizor;
+        numitor /= divizor;
+    };
+
+    void aduna(struct _Fractie f) {
+        numarator = numarator * f.numitor + f.numarator * numitor;
+        numitor   = numitor * f.numitor;
+    }
+
+    void scade(struct _Fractie f) {
+        numarator = numarator * f.numitor - f.numarator * numitor;
+        numitor   = numitor * f.numitor;
+    }
+    void inmulteste(struct _Fractie f) {
+        numarator *= f.numarator;
+        numitor *= f.numitor;
+    }
+
+    void imparte(struct _Fractie f) {
+        if (f.numarator != 0) {
+            numarator *= f.numitor;
+            numitor *= f.numarator;
+        }
+    }
+
+    float compara(struct _Fractie f) {
+        return tofloat() - f.tofloat();
+    }
+
+    float tofloat(void) {
+        if (numitor == 0) {
+            return 0;
+        }
+        return (float)numarator / (float)numitor;
+    };
+
+    void print(void) {
+        std::cout << numarator << '/' << numitor << '\n';
+    }
+
+    void citire(void) {
+        std::ifstream fin("sd/input/fractii.txt");
+        fin >> numarator >> numitor;
+        fin.close();
+    }
+
+} Fractie_t;
+
+// nu folosim functia built-in de citire pentru ca ar fi inafara scopului problemei sa facem
+// tratarea inaintarii citirii in fisier
+void citire_fractii(std::vector<Fractie_t> &fractii) {
+    std::ifstream fin("sd/input/fractii.txt");
+
+    int numarator;
+    int numitor;
+    while (fin >> numarator >> numitor) {
+        Fractie_t f;
+        f.numarator = numarator;
+        f.numitor   = numitor;
+        fractii.push_back(f);
+    }
+
+    fin.close();
+}
+
+void afisare_fractii(const std::vector<Fractie_t> &fractii) {
+    for (Fractie_t f : fractii) {
+        std::cout << f.numarator << '/' << f.numitor << ' ';
+    }
+    std::cout << '\n';
+
+    // afisare calcul
+    for (Fractie_t f : fractii) {
+        std::cout << f.tofloat() << ' ';
+    }
+    std::cout << '\n';
+}
+
+int main() {
+    std::vector<Fractie_t> fractii;
+    citire_fractii(fractii);
+    afisare_fractii(fractii);
+
+    for(Fractie_t &f: fractii) {
+        f.reductie();
+    }
+    afisare_fractii(fractii);
+
+    std::sort(fractii.begin(), fractii.end(), [](Fractie_t &f1, Fractie_t &f2) { return ((f1.tofloat() - f2.tofloat()) > 0); });
+    afisare_fractii(fractii);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 5}
+Se consideră un teren dreptunghiular reprezentat de o matrice de dimensiuni \textit{height × width}. Pe acest teren pasc văcute si se plimbă gâşte. Fiecare poziţie de pe teren este marcată cu 0 sau 2. Dacă este marcată cu 2, înseamnă că acolo se află două picoare. Văcuţele sunt reprezentate de două perechi picioare aflate pe poziţii alăturate (pe verticală sau pe orizontală). Gâştele sunt reprezentate de poziţii marcate cu 2, înconjurate de 0. Să se afişeze câte văcuţe şi cate gâşte sunt pe teren. \textbf{(1p)} \newline
+
+\begin{lstlisting}
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <tuple>
+#include <vector>
+
+void citire_intervale(std::vector<std::pair<int, int>> &intervale) {
+    std::ifstream fin("sd/input/intervale.txt");
+
+    int first, second;
+    while (fin >> first >> second) {
+        intervale.push_back(std::pair<int, int>(first, second));
+    }
+
+    fin.close();
+}
+
+int determina_intervalul(std::vector<std::pair<int, int>> &intervale, const int &target) {
+    // sortam intervalele in functie de primul item
+    std::sort(intervale.begin(), intervale.end(),
+              [](const std::pair<int, int> &a, const std::pair<int, int> &b) { return a.first < b.first; });
+
+    int idx = -1;
+    // max int32
+    int minim = 2147483647;
+
+    // complexitate worst case -> o(n)
+    // nu mi-e clar cum ar trebui sa folosesc cautare binara considerand ca trebuie gasit nu doar intervalul
+    // ci si cel de lungime minima, lucru care necesita parcurgerea cel putin o data a tuturor intervalelor valide
+    for (int i = 0; i < intervale.size(); i++) {
+        // daca numarul nostru cautat depaseste cel mai mic item din
+        if (target < intervale[i].first) {
+            break;
+        }
+
+        // check aditional pentru intervale care sunt mai mici decat numarul cautat
+        if (target > intervale[i].second) {
+            continue;
+        }
+
+        int len = intervale[i].second - intervale[i].first;
+        if (len < minim) {
+            minim = len;
+            idx   = i;
+        }
+    }
+
+    return idx;
+}
+
+int main() {
+    std::vector<std::pair<int, int>> intervale;
+    citire_intervale(intervale);
+
+    int idx = determina_intervalul(intervale, 8);
+    if(idx == -1) {
+        std::cout << "nu s-a gasit un interval\n";
+    }
+    else {
+        std::cout << '[' << intervale[idx].first << ", " << intervale[idx].second << "]\n";
+    }
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 6}
+Se consideră un vector de intervale. Se va folosi tipul \textbf{pair} pentru a reţine cele 2 capete (numere întregi) ale unui interval. Să se definească o funcţie care să determine în cel mai eficient mod(utilizând căutare binară) intervalul de lungime minimă în care se află un element dat ca parametru. Dacă acesta nu se află în interiorul niciunui interval, se va afişa un mesaj corespunzător. \textbf{(1.5p} \newline
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <queue>
+
+typedef struct _Stack {
+    std::queue<int> q1;
+    std::queue<int> q2;
+
+    int top(void) {
+        return q1.front();
+    }
+
+    void pop(void) {
+        if (q1.size() > 0) {
+            q1.pop();
+        }
+    }
+
+    void push(int item) {
+        q2.push(item);
+        while (q1.size() > 0) {
+            q2.push(q1.front());
+            q1.pop();
+        }
+
+        while (q2.size() > 0) {
+            q1.push(q2.front());
+            q2.pop();
+        }
+    }
+
+    bool isEmpty(void) {
+        return (q1.size() == 0);
+    }
+
+    void clear(void) {
+        while (q1.size() != 0) {
+            q1.pop();
+        }
+    }
+} Stack_t;
+
+int main() {
+    Stack_t stack;
+    stack.push(5);
+    stack.push(4);
+    stack.push(3);
+    stack.push(2);
+    stack.push(1);
+
+    // ordinea asteptata 1 2 3 4 5
+    while (stack.isEmpty() == false) {
+        std::cout << stack.top() << ' ';
+        stack.pop();
+    }
+
+    std::cout << '\n';
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 7}
+Să se simuleze o stivă utilizând două cozi. Se va crea structura stivă cu funcţiile de push(), pop(), isEmpty() şi clear(), iar cele 2 cozi vor fi câmpuri ale structurii. Puteţi folosi implementare proprie de coadă sau queue din C++. \textbf{(1p)} \newline
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+
+typedef struct Node {
+    int          key  = 0;
+    struct Node *next = nullptr;
+    struct Node *prev = nullptr;
+} Node_t;
+
+typedef struct {
+    Node_t *head = nullptr;
+    Node_t *tail = nullptr;
+
+    void push_front(int key) {
+        Node_t *node = new Node_t;
+        node->key    = key;
+        node->prev   = nullptr;
+        node->next   = head;
+
+        if (head != nullptr) {
+            head->prev = node;
+        }
+        head = node;
+
+        if (tail == nullptr) {
+            tail = node;
+        }
+    };
+
+    void push_back(int key) {
+        Node_t *node = new Node_t;
+        node->key    = key;
+        node->prev   = tail;
+        node->next   = nullptr;
+
+        if (tail != nullptr) {
+            tail->next = node;
+        }
+        tail = node;
+
+        if (head == nullptr) {
+            head = node;
+        }
+    };
+
+    void pop_front(void) {
+        if (size() == 0) {
+            std::cout << "lista este goala!\n";
+            return;
+        }
+
+        Node_t *aux = head;
+
+        if (head == tail) {
+            head = nullptr;
+            tail = nullptr;
+        }
+        else {
+            head       = head->next;
+            head->prev = nullptr;
+        }
+
+        delete aux;
+    };
+
+    void pop_back(void) {
+        if (size() == 0) {
+            std::cout << "lista este goala!\n";
+            return;
+        }
+
+        Node_t *aux = tail;
+
+        if (head == tail) {
+            head = nullptr;
+            tail = nullptr;
+        }
+        else {
+            tail       = tail->prev;
+            tail->next = nullptr;
+        }
+
+        delete aux;
+    };
+
+    Node_t *find(int key) {
+        if (size() == 0) {
+            std::cout << "lista este goala!\n";
+            return nullptr;
+        }
+
+        Node_t *node = head;
+        while (node != nullptr && node->key != key) {
+            node = node->next;
+        }
+
+        return node;
+    };
+
+    void erase(Node_t *node) {
+        if ((head == tail) && (head == node)) {
+            head = nullptr;
+            tail = nullptr;
+        }
+        else if (node == head) {
+            head       = node->next;
+            head->prev = nullptr;
+        }
+        else if (node == tail) {
+            tail       = node->prev;
+            tail->next = nullptr;
+        }
+        else {
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+        }
+        delete node;
+    };
+
+    void remove(int key) {
+        Node_t *node = head;
+        while (node != nullptr) {
+            Node_t *aux = node->next;
+            if (node->key == key) {
+                erase(node);
+            }
+
+            node = aux;
+        }
+    };
+
+    void insert_after(int key1, int key2) {
+        Node_t *node = find(key1);
+        if (node == nullptr) {
+            std::cout << "nu avem cheia data in lista!\n";
+            return;
+        }
+
+        if (node == tail) {
+            push_back(key2);
+        }
+        else {
+            Node_t *newnode = new Node_t;
+            newnode->key    = key2;
+
+            newnode->next    = node->next;
+            node->next->prev = newnode;
+            node->next       = newnode;
+            newnode->prev    = node;
+        }
+    };
+
+    bool empty(void) {
+        if (head == nullptr) {
+            return true;
+        }
+
+        return false;
+    };
+
+    void clear(void) {
+        while (head != nullptr) {
+            pop_front();
+        }
+    };
+
+    void print(void) {
+        if (size() == 0) {
+            std::cout << "lista este goala!\n";
+            return;
+        }
+
+        std::cout << "continut lista: ";
+        Node_t *curr = head;
+        while (curr != nullptr) {
+            std::cout << curr->key << ' ';
+            curr = curr->next;
+        }
+        std::cout << '\n';
+    };
+
+    int size(void) {
+        Node_t *curr = head;
+
+        int size = 0;
+        while (curr != nullptr) {
+            size++;
+            curr = curr->next;
+        }
+
+        return size;
+    };
+} LinkedList_t;
+
+bool palindrom(const LinkedList_t &ll) {
+    Node_t *head = ll.head;
+    Node_t *tail = ll.tail;
+
+    // conditie aditionala pentru liste de lungime para
+    while (head != tail && head->prev != tail) {
+        if (head->key != tail->key) {
+            return false;
+        }
+
+        head = head->next;
+        tail = tail->prev;
+    }
+
+    return true;
+}
+
+bool compare(LinkedList_t &ll1, LinkedList_t &ll2) {
+    if (ll1.size() != ll2.size()) {
+        return false;
+    }
+
+    Node_t *ll1_node = ll1.head;
+    Node_t *ll2_node = ll2.head;
+
+    while (ll1_node != nullptr && ll2_node != nullptr) {
+        if (ll1_node->key != ll2_node->key) {
+            return false;
+        }
+
+        ll1_node = ll1_node->next;
+        ll2_node = ll2_node->next;
+    }
+
+    return true;
+}
+
+// functie pentru a ne asigura ca nu folosim alti indecsi inafara de 1 si 2, lucru care ne-ar cauza un crash
+int index_lista(int idx) {
+    if (idx != 1 && idx != 2) {
+        return 0;
+    }
+
+    return idx - 1;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 8}
+Implementare listă dublu înlănţuită cu funcţionalităţile descrise. \textbf{(2p)} \newline
+\begin{lstlisting}
+#include <fstream>
+#include <iostream>
+#include <random>
+#include <string>
+#include <vector>
+
+typedef struct Node {
+    int          key  = 0;
+    struct Node *next = nullptr;
+} Node_t;
+
+typedef struct {
+    Node_t *head    = nullptr;
+    Node_t *tail    = nullptr;
+    int     nr_elem = 0;
+
+    void push(int elem) {
+        Node_t *node = new Node_t;
+        node->key    = elem;
+        node->next   = nullptr;
+
+        if (head == nullptr) {
+            head = node;
+            tail = node;
+        }
+        else {
+            tail->next = node;
+            tail       = node;
+        }
+
+        nr_elem++;
+    }
+
+    void pop(void) {
+        if (head == nullptr) {
+            return;
+        }
+
+        Node_t *aux = head;
+        head        = head->next;
+
+        delete aux;
+        nr_elem--;
+
+        if (head == nullptr) {
+            tail = head;
+        }
+    }
+
+    int front(void) {
+        if (head != nullptr) {
+            return head->key;
+        }
+
+        return 0;
+    }
+
+    int back(void) {
+        if (tail != nullptr) {
+            return tail->key;
+        }
+
+        return 0;
+    }
+
+    bool empty(void) {
+        // daca head = null, lista este goala
+        return (head == nullptr);
+    }
+
+    void clear(void) {
+        while (nr_elem != 0) {
+            pop();
+        }
+    }
+
+    int size(void) {
+        return nr_elem;
+    }
+
+    // pt debug
+    void print(void) {
+        Node_t *node = head;
+
+        while (node != nullptr) {
+            std::cout << node->key << ' ';
+            node = node->next;
+        }
+
+        std::cout << '\n';
+    }
+
+} Queue_t;
+
+void scriere_date_in_fisier(const int &idx, const int &n, const std::vector<std::string> &candidati) {
+    std::ofstream fout("output.txt");
+    fout << "candidati pentru maine:\n";
+    for (int i = idx; i < n; i++) {
+        fout << candidati[i] << '\n';
+    }
+
+    fout.close();
+}
+
+int main() {
+    int n, t;
+    // queue-ul a fost implementat pe baza unui int
+    // ca sa nu mai facem modificari la el, stocam indecsii elementelor din vector
+    // o sa folosim ambele structuri de date in paralel, chiar daca nu e neaparat eficient dpdv al memoriei
+    Queue_t q;
+
+    std::vector<std::string> candidati;
+    for (int i = 0; i < n; i++) {
+        q.push(i);
+    }
+
+    // generam vectorul de timpi. maparea e 1 la 1 -> candidatului cu index `i` i se atribuie timpul cu valoarea prezenta la
+    // indexul `i` din vectorul `timpi`
+    std::vector<int> timpi;
+    for (int i = 0; i < n; i++) {
+        // pentru un nr. random intre 15 si 25, generam un nr. random, luam restul impartirii lui la 10 si adunam cu 15
+        timpi.push_back(15 + (rand() % 10));
+
+        std::cout << candidati[i] << " are " << timpi[i] << " minute\n";
+    }
+
+    int timp_max    = 60 * t;
+    int timp_curent = 0;
+    while(q.empty() == false) {
+        // luam index candidat
+        int idx = q.front();
+        std::cout << "lui " << candidati[idx] << " i-au fost alocate " << timpi[idx] << " minute\n";
+
+        // cumulam timpul scurs
+        timp_curent += timpi[idx];
+        if(timp_curent > timp_max) {
+            std::cout << "\nnu ne-a mai ramas timp! oprim examinarea si continuam maine\n";
+            std::cout << "examenul continua de la " << candidati[idx] << '\n';
+            break;
+        }
+
+        std::cout << "> au mai ramas " << timp_max - timp_curent << '\n';
+        // scoatem candidatul
+        q.pop();
+    }
+
+    // idx = n - cati candidati au mai ramas in queue
+    scriere_date_in_fisier(n - q.size(), n, candidati);
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 9}
+Implementare coadă. \textbf{(2p)} \newline
+\begin{lstlisting}
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <stack>
+#include <string>
+#include <vector>
+
+int prioritate(char c) {
+    switch (c) {
+        case '^':
+            return 3;
+        case '*':
+        case '/':
+            return 2;
+        case '+':
+        case '-':
+        default:
+            break;
+    }
+
+    return 1;
+}
+
+// validare initiala care elimina expresiile cu caractere indoielnice
+bool expresie_valida(std::string &linie) {
+    const std::string caractere_valide = "1234567890+-*/^()";
+    const std::string operatori        = "+-*/^";
+
+    std::string aux = "";
+    for (char c : linie) {
+        if (c == ' ' || c == '\t') {
+            continue;
+        }
+
+        // daca nu gasim un caracter in lista de caractere valide, returnam
+        if (caractere_valide.find(c) == std::string::npos) {
+            std::cout << "caracter invalid : \"" << c << "\"\n";
+            return false;
+        }
+
+        // nu permitem doi operatori consecutivi (ex: ++)
+        if (!aux.empty() && operatori.find(aux.back()) != std::string::npos && operatori.find(c) != std::string::npos) {
+            std::cout << "prea multi operatori: " << aux.back() << c << "\n";
+            return false;
+        }
+
+        // scapam de caracterele albe acum, astfel facem parcurgerea asta o singura data
+        aux += c;
+    }
+
+    linie = aux;
+    return true;
+}
+
+void citeste_expresii_din_fisier(std::vector<std::string> &expresii) {
+    std::ifstream fin("sd/input/expresii.txt");
+
+    std::string linie;
+    while (std::getline(fin, linie)) {
+        if (expresie_valida(linie) == true) {
+            expresii.push_back(linie);
+        }
+        else {
+            std::cout << linie << " -> expresia nu este corecta\n";
+        }
+    }
+
+    fin.close();
+}
+
+float calculeaza_rpn(const std::vector<std::string> &polish) {
+    std::stack<float> stiva;
+
+    for (std::string s : polish) {
+        if (s == " ") {
+            continue;
+        }
+
+        if (isdigit(s[0])) {
+            stiva.push(std::stof(s));
+        }
+        else {
+            float b = stiva.top();
+            stiva.pop();
+            float a = stiva.top();
+            stiva.pop();
+
+            if (s == "+") {
+                stiva.push(a + b);
+            }
+            else if (s == "-") {
+                stiva.push(a - b);
+            }
+            else if (s == "*") {
+                stiva.push(a * b);
+            }
+            else if (s == "/") {
+                stiva.push(a / b);
+            }
+            else if (s == "^") {
+                stiva.push(std::pow(a, b));
+            }
+        }
+    }
+
+    return stiva.top();
+}
+
+void determinare_rpn(std::string linie) {
+    // string ca sa putem stoca mai multe caractere -> ne ajuta cu formare de numere
+    std::stack<char>         op_stack;
+    std::vector<std::string> polish;
+
+    std::string number = "";
+    for (int i = 0; i < linie.size(); i++) {
+        // regula folosita pentru conversie din char in str
+        if ('0' <= linie[i] && linie[i] <= '9') {
+            number += linie[i];
+            continue;
+        }
+        else if (number != "") {
+            polish.push_back(number);
+            polish.push_back(" ");
+            number = "";
+        }
+
+        char c = linie[i];
+        // https://stackoverflow.com/questions/17201590/how-can-i-create-a-string-from-a-single-character#comment83182095_17201751
+        std::string aux = "";
+
+        if (c == '(') {
+            op_stack.push(c);
+        }
+        else if (c == ')') {
+            while (!op_stack.empty() && op_stack.top() != '(') {
+                polish.push_back(aux + op_stack.top());
+                op_stack.pop();
+                polish.push_back(" ");
+            }
+
+            if (op_stack.empty()) {
+                std::cout << "eroare de parantezare!\n";
+                return;
+            }
+            op_stack.pop();
+        }
+        else {
+            while (!op_stack.empty() && op_stack.top() != '(' && prioritate(op_stack.top()) >= prioritate(c)) {
+                polish.push_back(aux + op_stack.top());
+                op_stack.pop();
+                polish.push_back(" ");
+            }
+            op_stack.push(c);
+        }
+    }
+
+    // fix pentru problema in care nu adauga ultimul numar
+    if (number != "") {
+        polish.push_back(number);
+        polish.push_back(" ");
+    }
+
+    while (!op_stack.empty()) {
+        std::string aux = "";
+        if (op_stack.top() == '(') {
+            std::cout << "eroare de parantezare!\n";
+            return;
+        }
+        polish.push_back(aux + op_stack.top());
+        op_stack.pop();
+        polish.push_back(" ");
+    }
+
+    std::cout << "expresie corecta, forma poloneza: ";
+    for (std::string s : polish) {
+        std::cout << s;
+    }
+
+    std::cout << "\nrezultat: " << calculeaza_rpn(polish) << '\n';
+}
+
+int main() {
+    std::vector<std::string> expresii;
+    citeste_expresii_din_fisier(expresii);
+
+    for (auto item : expresii) {
+        std::cout << item << '\n';
+        determinare_rpn(item);
+    }
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 10}
+Evaluarea expresiilor aritmetice. Se citeşte dintr-un fişier un şir de expresii aritmetice alcătuite din numere întregi fără semn, operatorii aritmetici +, −, ∗, /,ˆ(reprezentând ridicare la putere) şi paranteze rotunde. Expresiile pot fi despărţite între ele prin ; sau prin trecere la rând nou. \textbf{Atenţie}: algoritmul trebuie să funcţioneze corect şi dacă există caractere ”albe” în expresiile considerate (spaţii, tab-uri) şi dacă NU există! Spaţiile albe se ignoră la analizarea acestor expresii. \textbf{(3p)} \newline
+\begin{lstlisting}
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <stack>
+#include <string>
+#include <vector>
+
+int prioritate(char c) {
+    switch (c) {
+        case '^':
+            return 3;
+        case '*':
+        case '/':
+            return 2;
+        case '+':
+        case '-':
+        default:
+            break;
+    }
+
+    return 1;
+}
+
+void expresie_valida(std::string &linie) {
+    std::string aux = "";
+    for (char c : linie) {
+        if (c == ' ' || c == '\t') {
+            continue;
+        }
+        // scapam de caracterele albe acum, astfel facem parcurgerea asta o singura data
+        aux += c;
+    }
+
+    linie = aux;
+}
+
+void citeste_expresii_din_fisier(std::vector<std::string> &expresii) {
+    std::ifstream fin("sd/input/expresii2.txt");
+
+    std::string linie;
+    while (std::getline(fin, linie)) {
+        expresie_valida(linie);
+        expresii.push_back(linie);
+    }
+
+    fin.close();
+}
+
+void determinare_rpn(std::string linie, std::vector<char> &polish) {
+    std::stack<char> op_stack;
+
+    for (int i = 0; i < linie.size(); i++) {
+        char c = linie[i];
+
+        // functie care verifica daca avem o cifra sau un numar
+        if (isalnum(c)) {
+            polish.push_back(c);
+        }
+        else if (c == '(') {
+            // op_stack.push(c);
+            continue;
+        }
+        else if (c == ')') {
+            while (!op_stack.empty() && op_stack.top() != '(') {
+                polish.push_back(op_stack.top());
+                op_stack.pop();
+            }
+            if (!op_stack.empty())
+                op_stack.pop();
+        }
+        else {
+            while (!op_stack.empty() && prioritate(op_stack.top()) >= prioritate(c)) {
+                polish.push_back(op_stack.top());
+                op_stack.pop();
+            }
+            op_stack.push(c);
+        }
+    }
+
+    while (!op_stack.empty()) {
+        polish.push_back(op_stack.top());
+        op_stack.pop();
+    }
+
+    // Convert RPN back to infix with minimal parentheses
+    std::stack<std::pair<std::string, int>> expr_stack;
+    for (char c : polish) {
+        if (isalnum(c)) {
+            expr_stack.push({std::string(1, c), 4});
+        }
+        else {
+            auto right = expr_stack.top(); expr_stack.pop();
+            auto left = expr_stack.top(); expr_stack.pop();
+            int curr_prio = prioritate(c);
+            
+            std::string left_str = (left.second < curr_prio) ? "(" + left.first + ")" : left.first;
+            std::string right_str = (right.second < curr_prio) ? "(" + right.first + ")" : right.first;
+            
+            expr_stack.push({left_str + c + right_str, curr_prio});
+        }
+    }
+    
+    if (!expr_stack.empty()) {
+        std::cout << expr_stack.top().first << '\n';
+    }
+}
+
+int main() {
+    std::vector<std::string> expresii;
+    std::vector<char>        polish;
+
+    citeste_expresii_din_fisier(expresii);
+    for (auto item : expresii) {
+        std::cout << item << '\n';
+        determinare_rpn(item, polish);
+    }
+
+    return 0;
+}
+\end{lstlisting}
+
+\newpage
+
+\section*{Problema 11}
+\textbf{Eliminarea parantezelor redundante.} Se citeşte dintr-un fişier un şir de caractere reprezentând o expresie aritmetică formată din numere, operatori (+, - /, *), litere (reprezentând variabile), paranteze rotunde, eventual spaţii albe. Se cere eliminarea parantezelor redundante, utilizând o adaptare a algoritmului de la forma poloneză. \textbf{(5p)} \newline
+\begin{lstlisting}
+#include <cmath>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <stack>
+#include <string>
+#include <vector>
+
+int prioritate(char c) {
+    switch (c) {
+        case '^':
+            return 3;
+        case '*':
+        case '/':
+            return 2;
+        case '+':
+        case '-':
+        default:
+            break;
+    }
+
+    return 1;
+}
+
+void expresie_valida(std::string &linie) {
+    std::string aux = "";
+    for (char c : linie) {
+        if (c == ' ' || c == '\t') {
+            continue;
+        }
+        // scapam de caracterele albe acum, astfel facem parcurgerea asta o singura data
+        aux += c;
+    }
+
+    linie = aux;
+}
+
+void citeste_expresii_din_fisier(std::vector<std::string> &expresii) {
+    std::ifstream fin("sd/input/expresii2.txt");
+
+    std::string linie;
+    while (std::getline(fin, linie)) {
+        expresie_valida(linie);
+        expresii.push_back(linie);
+    }
+
+    fin.close();
+}
+
+void determinare_rpn(std::string linie, std::vector<char> &polish) {
+    std::stack<char> op_stack;
+
+    for (int i = 0; i < linie.size(); i++) {
+        char c = linie[i];
+
+        // functie care verifica daca avem o cifra sau un numar
+        if (isalnum(c)) {
+            polish.push_back(c);
+        }
+        else if (c == '(') {
+            // op_stack.push(c);
+            continue;
+        }
+        else if (c == ')') {
+            while (!op_stack.empty() && op_stack.top() != '(') {
+                polish.push_back(op_stack.top());
+                op_stack.pop();
+            }
+            if (!op_stack.empty())
+                op_stack.pop();
+        }
+        else {
+            while (!op_stack.empty() && prioritate(op_stack.top()) >= prioritate(c)) {
+                polish.push_back(op_stack.top());
+                op_stack.pop();
+            }
+            op_stack.push(c);
+        }
+    }
+
+    while (!op_stack.empty()) {
+        polish.push_back(op_stack.top());
+        op_stack.pop();
+    }
+
+    // refacem ecuatia
+    std::stack<std::pair<std::string, int>> op_stack_pair;
+    for (char c : polish) {
+        if (isalnum(c)) {
+            op_stack_pair.push({std::string(1, c), 4});
+        }
+        else {
+            // luam operanzii si prioritatea
+            std::pair<std::string, int> dreapta = op_stack_pair.top();
+            op_stack_pair.pop();
+            std::pair<std::string, int> stanga = op_stack_pair.top();
+            op_stack_pair.pop();
+
+            // vedem prioritatea curenta -> ne ajuta sa decidem daca avem nevoie de paranteze
+            int curr_prio = prioritate(c);
+
+            std::string stanga_str, dreapta_str;
+            if (stanga.second < curr_prio) {
+                stanga_str = "(" + stanga.first + ")";
+            }
+            else {
+                stanga_str = stanga.first;
+            }
+
+            if (dreapta.second < curr_prio) {
+                dreapta_str = "(" + dreapta.first + ")";
+            }
+            else {
+                dreapta_str = dreapta.first;
+            }
+
+            op_stack_pair.push({stanga_str + c + dreapta_str, curr_prio});
+        }
+    }
+
+    if (!op_stack_pair.empty()) {
+        std::cout << op_stack_pair.top().first << '\n';
+    }
+}
+
+int main() {
+    std::vector<std::string> expresii;
+    std::vector<char>        polish;
+
+    citeste_expresii_din_fisier(expresii);
+    for (auto item : expresii) {
+        std::cout << item << '\n';
+        determinare_rpn(item, polish);
+    }
+
+    return 0;
+}
+\end{lstlisting}
+
+\end{document}

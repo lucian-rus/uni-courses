@@ -1,0 +1,22 @@
+ls -al /usr/bin/passwd
+
+make lib
+make
+
+./filetype ./filetype /etc /dev/tty /dev/sr0 /var/run
+
+ls -l access
+./access access
+
+umask
+./umask
+ls -l foo bar
+
+ls -l foo bar
+./changemod
+ls -l foo bar
+
+
+
+# tema-2 -> fisierul deschis cu `stat` in loc de `fstat` nu recunoaste link-urile simbolice deoarece fstat ia ca param un file descriptor, care contine si proprietatile astea, 
+# dar stat ca ia param un path -> nu vede ca e symbolic link

@@ -1,0 +1,6 @@
+valeriu 6.3 6.7
+ioan 6.3 8
+alin 8.5 10
+madlena 10 8.9
+kiwi 10 9.5
+yuki 8.3 6.5

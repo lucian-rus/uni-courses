@@ -1,0 +1,180 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=tb
+}
+
+\begin{document}
+
+\section*{Code Listings}
+
+\subsection*{Listing 1: Directory Processing}
+\begin{lstlisting}
+#include <dirent.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(void) {
+    char curr[256];
+    // ideal era sa folosim `get_current_dir_name`, dar folosim `getcwd` ca sa ramanem posix-compliant
+    if (getcwd(curr, 256) == NULL) {
+        printf("eroare la deschidere\n");
+        return -1;
+    }
+    DIR *dir = opendir(curr);
+
+    struct dirent *entry;
+    // entry e un pointer la dir-ul curent, daca reapelam functia, inaintam pointer-ul la toate celelalte entitati care se afla in
+    // directorul target
+    while ((entry = readdir(dir)) != NULL) {
+        struct stat buf;
+        if (lstat(entry->d_name, &buf) < 0) {
+            printf("lstat error for %s", entry->d_name);
+            continue;
+        }
+
+        // facem stat ca sa verificam bit-ul de executie. daca e setat pentru oricare dintre situatiile de mai jos printam textul
+        // cu un format verde bold, asemanator unui terminal clasic, dupa care resetam culoarea textului
+        if (buf.st_mode & (S_IXGRP | S_IXOTH | S_IXUSR)) {
+            printf("\033[1;32m%s\033[0m\n", entry->d_name);
+        }
+        else {
+            printf("%s\n", entry->d_name);
+        }
+    }
+    closedir(dir);
+
+    return 0;
+}
+\end{lstlisting}
+
+\subsection*{Listing 2: Recursive Directory Traversal}
+\begin{lstlisting}
+static int myftw(char *pathname, Myfunc *func) {
+
+    // fullpath = path_alloc(NULL);	/* malloc's for PATH_MAX+1 bytes */
+    // strcpy(fullpath, pathname);	/* initialize fullpath */
+
+    // pornim de la sursa
+    if (chdir(pathname) < 0) {
+        err_ret("error chdir %s", pathname);
+        return -1;
+    }
+    return dopath(func);
+}
+static int dopath(Myfunc *func) {
+    struct stat    statbuf;
+    struct dirent *dirp;
+    DIR           *dp;
+    int            ret = 0;
+    char          *ptr;
+
+    // luam directorul curent
+    char curr[256] = {0};
+    if (getcwd(curr, 256) == NULL) {
+        printf("eroare la deschidere\n");
+        return func(curr, &statbuf, FTW_NS);
+    }
+
+    // printf("current: %s\n", curr);
+
+    if (lstat(curr, &statbuf) < 0)
+        return func(curr, &statbuf, FTW_NS); /* stat error */
+
+    if (S_ISDIR(statbuf.st_mode) == 0)
+        return func(curr, &statbuf, FTW_F); /* not a directory */
+
+    /*
+     * It's a directory.  First call func() for the directory,
+     * then process each filename in the directory.
+     */
+
+    if ((ret = func(curr, &statbuf, FTW_D)) != 0)
+        return ret;
+
+    // ptr = fullpath + strlen(fullpath);	/* point to end of fullpath */
+    // *ptr++ = '/';
+    // *ptr = 0;
+
+    if ((dp = opendir(curr)) == NULL)
+        return func(curr, &statbuf, FTW_DNR);
+
+    while ((dirp = readdir(dp)) != NULL) {
+        if (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
+            continue; /* ignore dot and dot-dot */
+
+        // strcpy(ptr, dirp->d_name);	/* append name after slash */
+
+        struct stat entry;
+        if (lstat(dirp->d_name, &entry) < 0)
+            continue;
+
+        // cum folosim chdir, trebuie sa ne asiguram ca ne intoarcem corect
+        if (S_ISDIR(entry.st_mode)) {
+            if (chdir(dirp->d_name) == 0) {
+                if ((ret = dopath(func)) != 0) { /* recursive */
+                    chdir("..");
+                    break; /* time to leave */
+                }
+                chdir("..");
+            }
+        }
+        else {
+            if ((ret = func(dirp->d_name, &entry, FTW_F)) != 0)
+                break;
+        }
+    }
+
+    // ptr[-1] = 0;	/* erase everything from slash onwards */
+
+    if (closedir(dp) < 0)
+        err_ret("can't close directory %s", curr);
+
+    return ret;
+}
+\end{lstlisting}
+
+\section*{Figures}
+
+\subsection*{Figure 1}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{1.png}
+    \caption{Figure 1}
+    \label{fig:1}
+\end{figure}
+
+\subsection*{Figure 2}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{2.png}
+    \caption{Figure 2}
+    \label{fig:2}
+\end{figure}
+
+\subsection*{Figure 3}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{3.png}
+    \caption{Figure 3}
+    \label{fig:3}
+\end{figure}
+
+\end{document}
+
+
