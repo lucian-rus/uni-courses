@@ -9,7 +9,7 @@ AR = ar
 LIBLAB = liblab6.a
 
 TEMPFILES = core core.* *.o *.out
-PROGS =	fork1 wait1 fork2 tellwait1 tellwait2 echoall exec1
+PROGS =	fork1 wait1 fork2 tellwait1 tellwait2 echoall exec1 nshell
 
 OBJS = error.o prexit.o tellwait.o
 
@@ -34,6 +34,9 @@ echoall: echoall.c $(LIBLAB)
 	$(CC) -o $@ $^
 
 exec1: exec1.c $(LIBLAB)
+	$(CC) -o $@ $^
+
+nshell: nshell.c $(LIBLAB)
 	$(CC) -o $@ $^
 
 lib: ${OBJS}
