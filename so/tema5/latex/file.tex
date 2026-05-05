@@ -1,7 +1,9 @@
 \documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{listings}
 
 \lstset{
     language=C++,
@@ -17,11 +19,37 @@
     frame=tb
 }
 
+
+\title{Laborator 3 - SO}
+\author{Rus Lucian-Florin}
+\date{April 22, 2026}
+
 \begin{document}
 
-\section*{Code Listings}
+\maketitle
 
-\subsection*{Listing 1: Directory Processing}
+\newpage
+\section*{Comenzi laborator}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{1.png}
+    \caption{Set comenzi laborator 1}
+    \label{fig:1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{2.png}
+    \caption{Set comenzi laborator 2}
+    \label{fig:2}
+\end{figure}
+
+\newpage
+\section*{Teme}
+
+\subsection*{Problema 2}
+
 \begin{lstlisting}
 #include <dirent.h>
 #include <stdio.h>
@@ -63,7 +91,20 @@ int main(void) {
 }
 \end{lstlisting}
 
-\subsection*{Listing 2: Recursive Directory Traversal}
+\newpage
+Snippet-ul de cod de pe pagina anterioara contine implementarea comenzii \textbf{nls}, reprezentand o implementare proprie a comenzii standard \textbf{ls} din Linux. Output-ul ambelor comenzi se poate vedea in imaginea alaturata. Pentru o simulare cat mai apropiata a comportamentului, s-au folosit si coduri de culoare.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{3.png}
+    \caption{Output comenzi \textbf{ls} si \textbf{nls}}
+    \label{fig:3}
+\end{figure}
+
+\newpage
+
+\subsection*{Problema 3}
+
 \begin{lstlisting}
 static int myftw(char *pathname, Myfunc *func) {
 
@@ -149,32 +190,14 @@ static int dopath(Myfunc *func) {
 }
 \end{lstlisting}
 
-\section*{Figures}
-
-\subsection*{Figure 1}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{1.png}
-    \caption{Figure 1}
-    \label{fig:1}
+    \includegraphics[width=0.8\textwidth]{4.png}
+    \caption{Output comenzi \textbf{ftw4} si \textbf{ftw4-2}}
+    \label{fig:4}
 \end{figure}
 
-\subsection*{Figure 2}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{2.png}
-    \caption{Figure 2}
-    \label{fig:2}
-\end{figure}
-
-\subsection*{Figure 3}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{3.png}
-    \caption{Figure 3}
-    \label{fig:3}
-\end{figure}
-
+Din imagine, se poate observa ca implementarea \textbf{ftw4-2}, implementarea care contine comanda de \textit{chdir} este putin mai rapida. Probabil, scalat la un director mai mare, timpii de executie ai comenzii implementate pentru tema ar fi simtitor mai buni. 
 \end{document}
 
 

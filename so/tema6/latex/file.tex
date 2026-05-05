@@ -1,0 +1,152 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=tb
+}
+
+
+\title{Laborator 6 - SO}
+\author{Rus Lucian-Florin}
+\date{May 5, 2026}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\section*{Comenzi laborator}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{1.png}
+    \caption{Set comenzi laborator 1}
+    \label{fig:1}
+\end{figure}
+
+In imaginea de mai sus se poate vedea cum redirectionarea comenzii cauzeaza problema de \textbf{buffering}, o problema comuna, cauzata de buffer-ul intern al implementarii \textbf{printf}. Aparitia problemei poate fi prevenita prin utilizarea functiei \textbf{fflush}. Referinta \textbf{\href{https://www.youtube.com/watch?v=tcYo6hipaSA&list=PLfqABt5AS4FkW5mOn2Tn9ZZLLDwA3kZUY&index=2}{video}}.
+
+\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{2.png}
+    \caption{Set comenzi laborator 2}
+    \label{fig:2}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{3.png}
+    \caption{Set comenzi laborator 3}
+    \label{fig:3}
+\end{figure}
+
+\newpage
+\section*{Teme}
+\subsection*{Problema 2}
+\begin{lstlisting}
+#include <stdio.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(void) {
+    printf("starting custom shell...\n");
+
+    while (true) {
+        printf("\033[1;32muser\033[0m$ ");
+        char aux[256] = {0};
+        scanf("%s", aux);
+
+        // exit command
+        if (strcmp(aux, "exit") == 0) {
+            break;
+        }
+
+        // fork to execute command
+        int pid = fork();
+
+        if (pid == 0) {  // Child process
+            execlp(aux, aux, NULL);
+            perror("execlp");
+            return 1;
+        } else {  // Parent process
+            wait(NULL);
+        }
+    }
+
+    printf("stopping custom shell...\n");
+    return 0;
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{4.png}
+    \caption{Output \textbf{tellwait2} dupa modificare}
+    \label{fig:4}
+\end{figure}
+
+\newpage
+\subsection*{Problema 3}
+\begin{lstlisting}
+#include "ourhdr.h"
+#include "sys/wait.h"
+#include <sys/types.h>
+
+static void charatatime(char *);
+
+int main(void) {
+    pid_t pid;
+
+    TELL_WAIT();
+
+    if ((pid = fork()) < 0)
+        err_sys("fork error");
+    else if (pid == 0) {
+        // WAIT_PARENT();		/* parent goes first */
+        charatatime("output from child\n");
+    }
+    else {
+        wait(NULL); // folosim `wait` pentru ca e mai usor de folosit
+        charatatime("output from parent\n");
+        TELL_CHILD(pid);
+    }
+    exit(0);
+}
+
+static void charatatime(char *str) {
+    char *ptr;
+    int   c;
+
+    setbuf(stdout, NULL); /* set unbuffered */
+    for (ptr = str; c = *ptr++;) putc(c, stdout);
+}
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{5.png}
+    \caption{Demonstratie \textbf{nshell}}
+    \label{fig:5}
+\end{figure}
+
+\textbf{Nota:} comanda \textbf{nshell} suporta doar comenzi formate dintr-un singur cuvant, fara argumente.
+
+\end{document}
