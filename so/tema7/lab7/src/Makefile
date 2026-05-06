@@ -7,7 +7,7 @@ CFLAGS = -Wall -g -O
 AR = ar
 
 TEMPFILES = core core.* *.o *.out
-PROGS =	hello prodcons semprodcons
+PROGS =	hello prodcons prodcons2 semprodcons
 
 all: ${PROGS}
 
@@ -15,6 +15,9 @@ hello: hello.c
 	$(CC) -o $@ $^
 
 prodcons: prodcons.c
+	$(CC) -o $@ $^
+
+prodcons2: prodcons2.c
 	$(CC) -o $@ $^
 
 semprodcons: semprodcons.c
