@@ -9,13 +9,19 @@ AR = ar
 LIBLAB = liblab8.a
 
 TEMPFILES = core core.* *.o *.out fifo2
-PROGS =	pipe1 pipe2 tellwait2 popen2 myuclc popen1 add2 pipe4 fifo
+PROGS =	pipe1 pipe2 pipe1-popen tellwait2 popen2 myuclc popen1 add2 pipe4 pipe4-fifo fifo
 
 OBJS = error.o tellwait.o
 
 all: ${PROGS}
 
 pipe1: pipe1.c $(LIBLAB)
+	$(CC) -o $@ $^
+
+pipe1-popen: pipe1-popen.c $(LIBLAB)
+	$(CC) -o $@ $^
+
+pipe4-fifo: pipe4-fifo.c $(LIBLAB)
 	$(CC) -o $@ $^
 
 pipe2: pipe2.c $(LIBLAB)

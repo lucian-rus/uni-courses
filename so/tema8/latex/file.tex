@@ -1,0 +1,419 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+
+\lstset{
+    language=C++,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{red},
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    numbers=left,
+    numberstyle=\tiny,
+    frame=tb
+}
+
+
+\title{Laborator 7 - SO}
+\author{Rus Lucian-Florin}
+\date{May 6, 2026}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\section*{Comenzi laborator}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{1.png}
+    \caption{Set comenzi laborator 1}
+    \label{fig:1}
+\end{figure}
+
+\newpage
+\section*{Teme}
+\subsection*{Problema 2}
+\begin{lstlisting}
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+// structura care ne permite sa transmitem o variabila de prioritate alaturi de mesaj
+// pornirea thread-urile intr-o ordine data necesita o schema de sincronizare specifica
+// in cazul de fata optam pentru o variabila care sa ne permita acest lucru
+typedef struct {
+    char msg[24]; // alocare static pentru ca e mai usor
+    int  prio;
+} context_t;
+
+sem_t thread2_start;
+
+void print_message_function(void *ptr) {
+    // daca avem prio 2, asteptam ca semaforul sa fie setat
+    if (((context_t *)ptr)->prio == 2) {
+        sem_wait(&thread2_start);
+    }
+
+    printf("%s ", ((context_t *)ptr)->msg);
+
+    // daca avem prio 1, setam semaforul
+    if (((context_t *)ptr)->prio == 1) {
+        sem_post(&thread2_start);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t thread1, thread2;
+
+    // numar mai mare -> prio mai mica
+    context_t msg1 = {
+        .prio = 1,
+        .msg  = "Hello",
+    };
+    context_t msg2 = {
+        .prio = 2,
+        .msg  = "world",
+    };
+
+    // initializam cu 0 pentru ca thread2 sa nu porneasca
+    sem_init(&thread2_start, 0, 0);
+
+    // trimitem structurile prin cast la void
+    pthread_create(&thread1, NULL, (void *)&print_message_function, (void *)&msg1);
+    pthread_create(&thread2, NULL, (void *)&print_message_function, (void *)&msg2);
+
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+    exit(0);
+}
+
+\end{lstlisting}
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{2.png}
+    \caption{Output \textbf{hello} inainte si dupa modificare}
+    \label{fig:2}
+\end{figure}
+
+Putem observa cum, inainte de modificari, comportamentul nu este deterministic, fapt care duce la nevoia de a implementare o schema de sincronizare specifica. Pentru implementare, s-a folosit o structura cu un identificator de prioritate, reprezentat de un numar intreg.
+
+\newpage
+\subsection*{Problema 3}
+\begin{lstlisting}
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ITEMS 10
+
+long buffer[ITEMS];
+int  head = 0, tail = 0;
+
+pthread_mutex_t mutex;
+pthread_cond_t  thread_condition;
+struct timespec delay;
+
+long produce_item(void) {
+    long item = random() % 256;
+    printf("producing %d\n", item);
+
+    return item;
+}
+
+void consume_item(long item) {
+    printf("consuming %d\n", item);
+}
+
+void producer_function(void) {
+    while (1) {
+        pthread_mutex_lock(&mutex);
+        if ((tail + 1) % ITEMS != head) {
+            buffer[tail] = produce_item();
+            tail         = (tail + 1) % ITEMS;
+        }
+        pthread_mutex_unlock(&mutex);
+
+        // facem broadcast pentru ca, desi avem doar un consumer, codul e mai fool proof
+        pthread_cond_broadcast(&thread_condition);
+        nanosleep(&delay, NULL);
+    }
+}
+
+void consumer_function(void) {
+    while (1) {
+        // pthread_mutex_lock(&mutex);
+        if (head != tail) {
+            consume_item(buffer[head]);
+            head = (head + 1) % ITEMS;
+        }
+        // pthread_mutex_unlock(&mutex);
+
+        // putem sa comentam lock/unlock pentru ca `cond_wait` o sa faca unlock apoi lock pentru noi
+        pthread_cond_wait(&thread_condition, &mutex);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t producer;
+
+    // 250 msec
+    delay.tv_sec  = 0;
+    delay.tv_nsec = 250000000;
+
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&thread_condition, NULL);
+
+    pthread_create(&producer, NULL, (void *)&producer_function, NULL);
+
+    consumer_function();
+}
+\end{lstlisting}
+
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+\bigskip
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{3.png}
+    \caption{Demonstratie \textbf{prodcons} inainte de modificari}
+    \label{fig:3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{4.png}
+    \caption{Demonstratie \textbf{prodcons} dupa modificari}
+    \label{fig:4}
+\end{figure}
+
+\newpage
+\subsection*{Problema 4}
+\begin{lstlisting}
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ITEMS 10
+
+long buffer[ITEMS];
+int  head = 0, tail = 0;
+
+pthread_mutex_t mutex;
+pthread_cond_t  thread_condition;
+struct timespec delay;
+
+// functia produce ia ca param `prod_id` care ne ajuta sa determinam din ce functie s-a apelat productia
+long produce_item(int prod_id) {
+    long item = random() % 256;
+    printf("producing %d on id: %d\n", item, prod_id);
+
+    return item;
+}
+
+void consume_item(long item) {
+    printf("consuming %d\n", item);
+}
+
+void producer_function1(void) {
+    while (1) {
+        pthread_mutex_lock(&mutex);
+        if ((tail + 1) % ITEMS != head) {
+            buffer[tail] = produce_item(1);
+            tail         = (tail + 1) % ITEMS;
+        }
+        pthread_mutex_unlock(&mutex);
+
+        pthread_cond_broadcast(&thread_condition);
+        nanosleep(&delay, NULL);
+    }
+}
+
+void producer_function2(void) {
+    while (1) {
+        pthread_mutex_lock(&mutex);
+        if ((tail + 1) % ITEMS != head) {
+            buffer[tail] = produce_item(2);
+            tail         = (tail + 1) % ITEMS;
+        }
+        pthread_mutex_unlock(&mutex);
+
+        // facem broadcast pentru ca avem doi consumeri. refolosim, in mare, codul din exercitiul trecut
+        pthread_cond_broadcast(&thread_condition);
+        nanosleep(&delay, NULL);
+    }
+}
+
+void consumer_function(void) {
+    while (1) {
+        if (head != tail) {
+            consume_item(buffer[head]);
+            head = (head + 1) % ITEMS;
+        }
+        // putem sa comentam lock/unlock pentru ca `cond_wait` o sa faca unlock apoi lock pentru noi
+        pthread_cond_wait(&thread_condition, &mutex);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t producer;
+
+    // 250 msec
+    delay.tv_sec  = 0;
+    delay.tv_nsec = 250000000;
+
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&thread_condition, NULL);
+
+    // avem doua functii producator, 1 si 2, replici exacte ale functiei originale
+    pthread_create(&producer, NULL, (void *)&producer_function1, NULL);
+    pthread_create(&producer, NULL, (void *)&producer_function2, NULL);
+
+    // functia consumer nu sufera modificari
+    consumer_function();
+    // cleanup
+    pthread_cond_destroy(&thread_condition);
+}
+
+\end{lstlisting}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{5.png}
+    \caption{Demonstratie \textbf{prodcons} cu mai multi producatori}
+    \label{fig:5}
+\end{figure}
+
+
+\newpage
+\subsection*{Problema 5}
+\begin{lstlisting}
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define ITEMS 10
+
+long buffer[ITEMS];
+int  head = 0, tail = 0;
+
+sem_t free_slots, full_slots;
+
+pthread_mutex_t mutex;
+struct timespec delay;
+
+long produce_item(void) {
+    long item = random() % 256;
+    printf("producing %d\n", item);
+
+    return item;
+}
+
+// functia ia ca param `consumer_id` ca sa ne ajute sa identificam din ce consumer a fost chemata
+void consume_item(long item, int consumer_id) {
+    printf("consuming %d from id: %d\n", item, consumer_id);
+}
+
+void producer_function(void) {
+    while (1) {
+        sem_wait(&free_slots);
+        pthread_mutex_lock(&mutex);
+
+        if ((tail + 1) % ITEMS != head) {
+            buffer[tail] = produce_item();
+            tail         = (tail + 1) % ITEMS;
+        }
+
+        pthread_mutex_unlock(&mutex);
+        sem_post(&full_slots);
+
+        nanosleep(&delay, NULL);
+    }
+}
+
+void consumer_function1(void) {
+    while (1) {
+        sem_wait(&full_slots);
+        pthread_mutex_lock(&mutex);
+
+        if (head != tail) {
+            consume_item(buffer[head], 1);
+            head = (head + 1) % ITEMS;
+        }
+
+        pthread_mutex_unlock(&mutex);
+        sem_post(&free_slots);
+    }
+}
+
+void consumer_function2(void) {
+    while (1) {
+        sem_wait(&full_slots);
+        pthread_mutex_lock(&mutex);
+
+        if (head != tail) {
+            consume_item(buffer[head], 2);
+            head = (head + 1) % ITEMS;
+        }
+
+        pthread_mutex_unlock(&mutex);
+        sem_post(&free_slots);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    pthread_t producer;
+    // ave, nevoie de un thread pentru un consumator aditional
+    pthread_t consumer_thread;
+
+    // 250 msec
+    delay.tv_sec  = 0;
+    delay.tv_nsec = 250000000;
+
+    sem_init(&free_slots, 0, ITEMS - 1);
+    sem_init(&full_slots, 0, 0);
+
+    pthread_mutex_init(&mutex, NULL);
+    pthread_create(&producer, NULL, (void *)&producer_function, NULL);
+
+    // thread doar pentru consumer1, consumer2 ramane in main thread
+    pthread_create(&consumer_thread, NULL, (void *)&consumer_function1, NULL);
+    consumer_function2();
+}
+
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{6.png}
+    \caption{Demonstratie \textbf{semprodcons} cu mai multi consumeri}
+    \label{fig:6}
+\end{figure}
+
+\end{document}
