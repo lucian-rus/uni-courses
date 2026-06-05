@@ -1,0 +1,185 @@
+LINEAR DATA STRUCTURES
+
+* array - colectie de elemente de acelasi tip stocate intr-o zona de memorie contigua
+    - acces:                o(1)
+    - cautare:              o(n)
+    - insertie/stergere:    o(n) (necesită mutarea elementelor adiacente)
+
+(desen)
+
+* matrix - tablou bidimensional (array de array-uri)
+    - acces:                o(1)
+    - cautare:              o(n*m)
+    - insertie/stergere:    o(n*m) (necesită mutarea elementelor adiacente)
+
+(desen)
+
+* singly-linked list - colectie liniara de noduri distribuite necontiguu in memorie. fiecare element pointeaza spre urmatorul
+    - acces:                            o(n)
+    - cautare:                          o(n)
+    - insertie/stergere (la inceput):   o(1) 
+    - stergere/stergere (la coada):     o(n) (poate fi o(1) daca tinem un pointer la coada)
+
+- compozitie:
+    > continut (orice tip de date)
+    > pointer la urmatorul nod
+    > pointer la coada (optional)
+
+- utilizare:
+    > insertii si stergeri frecvente
+    > implementare alte structuri de date
+
+(desen)
+
+* doubly-linked list - colectie liniara de noduri distribuite necontiguu in memorie. fiecare element pointeaza atat spre urmatorul cat si spre elementul anterior
+    - acces:                            o(n)
+    - cautare:                          o(n)
+    - insertie/stergere (la inceput):   o(1) 
+    - stergere/stergere (la coada):     o(1)
+
+- compozitie:
+    > continut (orice tip de date)
+    > pointer la urmatorul nod
+    > pointer la nodul anterior
+
+- utilizare:
+    > insertii si stergeri frecvente
+    > implementare alte structuri de date
+
+(desen)
+
+* stack - structura de date liniara care functioneaza pe principiul LIFO (last in, first out)
+    - acces:                            o(1) 
+    - cautare:                          o(n) (teoretic nu e permisa, dar ca sa cautam un element, putem sa parcurgem stiva)
+    - insertie/stergere:                o(1) 
+
+- utilizare:
+    > recursivitate, backtracking, stiva de executie
+    > inversare a elementelor
+
+(desen)
+
+* queue - structura de date liniara care functioneaza pe principiul FIFO (first in, first out)
+    - acces:                            o(1) 
+    - cautare:                          o(n) (teoretic nu e permisa, dar ca sa cautam un element, putem sa trecem prin coada)
+    - insertie/stergere:                o(1) 
+
+- utilizare:
+    > cozi de asteptare
+    > prelucrarea datelor fara a modifica ordinea in care apar
+
+(desen)
+
+- cozi particulare
+    > circular - coada de dimensiune fixa in care ultima pozitie este urmata de prima
+    > priority - coada in care fiecare element are asociata o prioritate (mai multe informatii la capitolul specific)
+    > dequeue  - coada care permite inserarea si stergerea elementelor la ambele capete
+
+
+HASH MAPS
+* dictionary (hash tables) - structura de date care mapeaza "chei" unice cu valori; utilizeaza functii de dispersie (hash functions)
+    - acces:                            o(1) 
+    - cautare:                          o(1)
+    - insertie/stergere:                o(1) 
+
+- utilizare:
+    > insertii/cautari/stergeri rapide
+    > cautari pe baza cheii
+    > contorizarea aparitiei elementelor
+
+(desen)
+
+* set - structura de date care stocheaza elemente unice; functioneaza asemanator cu un dictionary, dar nu ofera functia de contorizare
+    - acces:                            o(1) 
+    - cautare:                          o(1)
+    - insertie/stergere:                o(1) 
+
+- utilizare:
+    > insertii/cautari/stergeri rapide
+    > cautari pe baza cheii
+    > eliminarea duplicatelor
+
+(desen)
+
+
+TREES
+
+* binary - structura ierarhica in care fiecare nod parinte are cel mult doi descendenti, "stanga" si "dreapta"
+    - acces:                            o(n) 
+    - cautare:                          o(n)
+    - insertie/stergere:                o(n) 
+
+(desen)
+
+* binary search tree (BST) - un binary tree in care descendentii din stanga sunt mai mici decat parintele si cei din dreapta sunt mai mari
+    - acces:                            o(logn) (maxim o(n) in cazul pesimist al dezechilibrarii)
+    - cautare:                          o(logn) (maxim o(n) in cazul pesimist al dezechilibrarii)
+    - insertie/stergere:                o(logn) (maxim o(n) in cazul pesimist al dezechilibrarii)
+
+- utilizare:
+    > indexari rapide
+    > seturi de date care trebuie mereu sortate
+
+(desen)
+
+* heap - arbore binar aproape complet care respecta proprietatea de stiva
+    - cautare:                          o(1)
+    - insertie/stergere:                o(logn) 
+
+- utilizare:
+    > heapsort
+    > priority queues
+
+(desen)
+
+- heap-uri particulare
+    > min - cheia parintelui este mai mica sau egala decat cheile copiilor (root = minim)
+    > max - cheia parintelui este mai mare sau egala decat cheile copiilor (root = maxim)
+
+* balanced tree - arbori care se auto-echilibreaza
+    - acces:                            o(logn) 
+    - cautare:                          o(logn)
+    - insertie/stergere:                o(logn) 
+
+- utilizare
+    > seturi si harti sortate
+
+(desen)
+
+- balanced trees particulari:
+    > avl       - diferenta intre subarborele stang si cel drept pentru absolut orice nod este maxim 1 
+    > red-black - arbore de cautare binar auto-echilibrat unde fiecare nod detine o "culoare", in scopul rebalansarii
+
+* trie - arbore "prefix", specializat pe stocarea sirurilor de caractere
+    - acces:                            o(l) 
+    - cautare:                          o(l)
+    - insertie/stergere:                o(l) 
+
+- utilizare
+    > autocomplete
+    > search engines
+    > validare
+    > network routing
+    
+(desen)
+
+STL CONTAINERS
+
+pair            - struct
+tuple           - struct
+
+vector          - arrays
+
+forward_list    - struct (simply-linked list)
+list            - struct (doubly-linked list)
+
+stack           - list
+queue           - list
+
+unordered_set   - hash table
+unordered_map   - hash table
+set             - arn
+map             - arn
+
+priority_queue  - heap (max/min)
+

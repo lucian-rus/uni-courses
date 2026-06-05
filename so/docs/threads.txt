@@ -1,0 +1,41 @@
+THREADS
+
+TEORIE
+- thread-ul este unitatea elementara de utilizare a procesorului
+- un thread este alcatuit din thread ID, program counter, set propriu de registrii si stiva; restul resurselor sunt partajate cu celelalte thread-uri
+- thread-urile se creeaza mai repede decat procesele si pot comunica prin intermediul sectiunii de date comune, nefiind necesara folosirea mecanismelor SO 
+- aplicatiile multithreading pot folosi core-uri separate pe un CPU multi-core 
+>>>>>>>>>>>>>> desen single vs multi hread <<<<<<<<<<<<<<<
+
+- beneficii:
+    - timp de raspuns mic
+    - partajarea resurselor
+    - economie
+    - scalabilitate
+
+DEFINITII
+* concurenta        - thread-urile se executa intretesut, pe un singur core
+* paralelism        - thread-urile se executa in paralel, pe core-uri multiple
+* thread kernel     - modele spre executie propuse de user
+* thread user       - suportul SO pentru executie multi-threading oferite de kernel
+* many to one       - mai multe thread-uri user la un singur thread kernel (concurenta)
+* one to one        - un thread user la un thread kernel
+* many to many      - un set de thread-uri user la un set de thread-uri kernel
+
+>>>>>>>>>>>>>> desen single core vs multi core <<<<<<<<<<<<<<<
+
+* race condition  - situatie in care doua sau mai multe thread-uri incearca sa acceseze aceeasi locatie de memorie; poate duce la comportament nedefinit
+* mutex           - actioneaza ca un "lacat programatic", blocand resursa din a fi accesata simultan de doua sau mai multe thread-uri
+* cond_var        - variabila conditionala
+* semaphore
+
+* produces        - 
+* consumer        - 
+
+POSIX
+- thread-urile din POSIX necesita includerea header-ului <pthread.h> si link-uirea librariei pthread
+
+functii si concepte importante 
+* pthread_create()	- creeaza un thread
+* pthread_join()	- asteapta finalizarea unui thread
+* pthread_exit()    - termina thread-ul care cheama functia

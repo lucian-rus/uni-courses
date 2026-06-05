@@ -1,0 +1,28 @@
+PROCESSES
+
+
+TEORIE
+* proces            - un program aflat in executie
+* program counter   - registrul care stocheaza instructiunea curenta a procesului
+* activation record - se salveaza pe stiva la un apel al unei functii si contine datele despre functie (variabile locale, adresa de revenire etc)
+
+zone de memorie cu size determinat
+* text section      - zona de memorie unde se stocheaza codul executabil
+* data section      - zona de memorie unde se stocheaza variabilele statice si globale
+* BSS               - zona de memorie alocata pentru variabile neinitializate
+
+zone de memorie cu size dinamic
+* heap              - zona de memorie alocata dinamic
+* stack             - zona de memorie alocata temporar pentru functii 
+
+process state machine - desen
+un proces poate sa treaca prin mai multe stari:
+* new         - proces creat
+* ready       - asteapta alocare de cpu
+* running     - executa instructiuni
+* waiting     - in asteptare de instructiuni sau eliberare de resurse
+* terminated  - procesul si-a incheiat executia
+
+process control block (pcb) - desen
+
+POSIX

@@ -1,0 +1,2 @@
+Mircea 19 INFO 900.0
+Anastasia 23 MATE 1300.0

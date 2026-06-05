@@ -1,0 +1,3 @@
+ALGO'S TO STUDY
+
+* floyd's cycle finding algo (fast and slow pointers)
