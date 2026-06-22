@@ -1,0 +1,56 @@
+
+1. Rotația la DREAPTA — dr(y)
+Condiție: x este copilul stâng al lui y.
+Pași:
+1. β (copilul drept al lui x) → devine copilul stâng al lui y
+2. y → devine copilul drept al lui x
+3. x → ia locul lui y
+        y                  x
+       / \      dr(y)     / \
+      x   γ    ------>   α   y
+     / \                    / \
+    α   β                  β   γ
+Ordinea cheilor: α < x < β < y < γ — valabilă în ambele desene.
+
+
+2. Rotația la STÂNGA — st(x)
+Condiție: y este copilul drept al lui x. (E exact inversa lui dr(y) — citește desenul de sus de la dreapta la stânga.)
+Pași:
+1. β (copilul stâng al lui y) → devine copilul drept al lui x
+2. x → devine copilul stâng al lui y
+3. y → ia locul lui x
+      x                    y
+     / \        st(x)     / \
+    α   y      ------>   x   γ
+       / \              / \
+      β   γ            α   β
+
+
+
+3. Rotația dublă STÂNGA-DREAPTA — st(y), apoi dr(z)
+Condiție (triunghi): y e copilul stâng al lui z, iar x e copilul drept al lui y. Subarborii: T1 (stângul lui y), T2 și T3 (copiii lui x), T4 (dreptul lui z).
+Pași:
+1. st(y) → x urcă în locul lui y, triunghiul devine linie stângă
+2. dr(z) → x urcă în vârf
+      z                  z                   x
+     / \                / \                /   \
+    y   T4   st(y)     x   T4   dr(z)    y     z
+   / \      ------>   / \      ------>  / \   / \
+  T1  x              y   T3            T1 T2 T3 T4
+     / \            / \
+    T2  T3         T1  T2
+4. Rotația dublă DREAPTA-STÂNGA — dr(y), apoi st(z)
+Condiție (triunghi oglindit): y e copilul drept al lui z, iar x e copilul stâng al lui y.
+Pași:
+1. dr(y) → x urcă în locul lui y, triunghiul devine linie dreaptă
+2. st(z) → x urcă în vârf
+    z                  z                     x
+   / \                / \                  /   \
+  T1  y     dr(y)   T1   x      st(z)    z     y
+     / \   ------>      / \    ------>  / \   / \
+    x   T4             T2  y           T1 T2 T3 T4
+   / \                    / \
+  T2  T3                 T3  T4
+Observații care leagă totul
+La ambele rotații duble, rezultatul final e identic ca formă: x ajunge rădăcină, cu z și y drept copii, iar T1, T2, T3, T4 atârnă în aceeași ordine de la stânga la dreapta. Asta nu e întâmplător — ordinea stânga–dreapta (inordinea) e mereu T1, apoi nodul mic, T2, x, T3, nodul mare, T4, și ea nu se schimbă la nicio rotație. De-aia proprietatea de arbore de căutare supraviețuiește (exact demonstrația de la exercițiul 4).
+Și un detaliu de care să fii atent la examen: la rotația dublă, subarborii T2 și T3 (copiii lui x) sunt cei care "se despart" — T2 ajunge copilul drept al nodului mic, T3 ajunge copilul stâng al nodului mare. E singurul loc unde se greșește frecvent.

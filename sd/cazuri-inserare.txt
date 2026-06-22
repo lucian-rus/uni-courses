@@ -1,0 +1,43 @@
+Cazul 1 — unchiul e ROȘU → doar recolorare
+Situația: avem deja arborele cu 20(N), copiii 10(R) și 30(R). Inserăm 5 → devine copilul stâng al lui 10, roșu. Încălcare: 5(R) are părintele 10(R).
+Verificăm unchiul lui 5 = fratele părintelui = 30(R) → roșu → Cazul 1.
+        20(N)                    20(R)
+       /     \    recolorare    /     \
+     10(R)  30(R)  ------->  10(N)   30(N)
+     /                        /
+   5(R) ←nou               5(R)
+Ce s-a făcut: părintele 10 și unchiul 30 → negri; bunicul 20 → roșu. Zero rotații.
+Continuarea: problema "urcă" la 20 — verificăm dacă 20(R) are părinte roșu. Aici 20 e chiar rădăcina, deci aplicăm regula finală: rădăcina se revopsește mereu în negru → 20(N). Gata.
+Cazul 2 — unchiul e NEGRU, triunghi → prima rotație
+Situația: avem 20(N) cu copilul stâng 10(R). Inserăm 15 → copil drept al lui 10, roșu. Încălcare: 15(R) cu părintele 10(R).
+Unchiul lui 15 = copilul drept al lui 20 = NIL (lipsește), iar frunzele NIL se consideră negre → suntem în cazurile 2/3. Configurația: 10 e copil stâng, 15 e copil drept → zig-zag → triunghi → Cazul 2.
+     20(N)                 20(N)
+     /         st(10)      /
+   10(R)      ------->   15(R)
+      \                  /
+     15(R) ←nou        10(R)
+Ce s-a făcut: rotație stânga în jurul părintelui (10). Fără recolorare încă! Observă că acum 15(R)–10(R) formează o linie stânga-stânga — adică exact Cazul 3, pe care îl aplicăm imediat:
+Cazul 3 — unchiul e NEGRU, linie → rotație în jurul bunicului + recolorare
+Continuăm exemplul de mai sus (sau imaginează-ți direct că am fi inserat 20, 10, 15... pardon, 20, 15, 10 — linie pură):
+       20(N)                    15(N)
+       /          dr(20)       /     \
+    15(R)        ------->   10(R)   20(R)
+     /          +recolorare
+   10(R)
+Ce s-a făcut: rotație dreapta în jurul bunicului (20), apoi recolorare: nodul urcat 15 → negru, fostul bunic 20 → roșu. Încălcarea a dispărut (10 și 20 sunt roșii, dar părintele lor 15 e negru) și algoritmul se oprește aici — Cazul 3 e mereu terminal.
+Exemplu "pur" de Caz 3 (fără triunghi înainte)
+Inserăm pe rând 30, 20, 10:
+* 30 → rădăcină, devine N
+* 20 → copil stâng, R — părintele 30 e negru, nicio problemă
+* 10 → copil stâng al lui 20, R → încălcare 10(R)–20(R). Unchi = NIL (negru), configurație linie stânga-stânga → direct Cazul 3:
+       30(N)                   20(N)
+       /         dr(30)       /     \
+    20(R)       ------->   10(R)   30(R)
+     /         +recolorare
+  10(R)
+Schema de decizie (de memorat)
+1. Nodul nou e roșu, părintele e roșu? Dacă nu → gata.
+2. Unchi roșu? → Cazul 1: recolorează (părinte+unchi→N, bunic→R), urcă la bunic și reia de la pasul 1.
+3. Unchi negru + triunghi? → Cazul 2: rotește în jurul părintelui (spre exterior) → ai obținut linie.
+4. Unchi negru + linie? → Cazul 3: rotește în jurul bunicului + schimbă culorile între nodul urcat și fostul bunic. STOP.
+5. La final, mereu: rădăcina → neagră.

@@ -1,0 +1,40 @@
+SISTEMUL DE CALCUL SI ARHITECTURA
+* SISTEMUL DE CALCUL                  - ansamblu de componente interconectate destinat prelucrarii datelor
+* COMPONENTA HARDWARE                 - totalitatea resurselor fizice si materiale care alcatuiesc calculatorul
+* SUBSISTEMUL SOFTWARE                - totalitatea resurselor logice si a programelor de sistem sau de aplicatie
+* ARHITECTURA SISTEMULUI              - specificatiile unitatilor functionale si conectarile fizice si logice dintre ele
+* NIVELUL MICROARHITECTURII           - nivel conceptual in care sistemul este o colectie de registri si o unitate de calcul
+* NIVELUL ISA                         - nivelul arhitecturii setului de instructiuni recunoscute direct de masina fizica
+
+STRUCTURA FUNCTIONALA SI CLASIFICARI
+* UNITATEA CENTRALA DE PRELUCRARE     - ansamblul format din unitatea de comanda si control si unitatea aritmetico logica
+* SISTEM MONOPROCESOR                 - calculator dotat cu o singura unitate centrala de prelucrare
+* SISTEM MULTIPROCESOR                - calculator dotat cu cel putin doua unitati de prelucrare cu acces comun la memorie
+* ARHITECTURA VON NEUMANN             - model bazat pe executia secventiala avand memorie unica pentru date si instructiuni
+* ARHITECTURA HARVARD                 - model arhitectural caracterizat prin memorii separate pentru instructiuni si date
+
+SISTEMUL DE INTRARE IESIRE
+* PERIFERICE BLOC                     - dispozitive care organizeaza informatia in blocuri de lungime fixa adresabile
+* PERIFERICE CARACTER                 - dispozitive care furnizeaza sau primesc un flux continuu de octeti neadresabili
+* RATA DE TRANSFER                    - cantitatea maxima de date care poate fi transferata de o componenta pe secunda
+* TIMP DE ACCES                       - intervalul necesar obtinerii sau furnizarii unei unitati de informatie solicitate
+* PORT DE INTRARE IESIRE              - registrul prin care se realizeaza fizic schimbul de informatii cu exteriorul
+* DRIVER                              - aplicatie software care asigura legatura logica intre un periferic si procesor
+
+MAGISTRALE DE COMUNICARE
+* MAGISTRALA SISTEM                   - ansamblu de linii de semnal pentru date adrese si control intre componente
+* MAGISTRALA SINCRONA                 - magistrala la care comunicarea este coordonata strict de generatorul de tact
+* MAGISTRALA ASINCRONA                - magistrala fara ceas in care transferul este validat prin protocoale de confirmare
+* TRANSFER DMA                        - transfer direct de date intre memorie si periferice fara implicarea procesorului
+* MAGISTRALA DE EXTENSIE              - cale de comunicare care permite adaugarea de placi interschimbabile prin sloturi
+
+UNITATEA DE MEMORIE
+* CELULA BINARA                       - unitatea hardware minima de stocare capabila sa retina un singur bit de informatie
+* MEMORIA CACHE                       - memorie interna ultra rapida si de mica capacitate ce comunica direct cu procesorul
+* MEMORIA PRINCIPALA                  - memorie interna volatila care contine datele si programele in curs de executie
+* MEMORIA SECUNDARA                   - memorie externa de capacitate mare nevolatila folosita pentru stocare permanenta
+* MEMORIE VIRTUALA                    - mecanism hardware si software utilizat pentru a extinde logic memoria fizica
+* PAGINAREA                           - tehnica de gestiune a memoriei virtuale care divide spatiul in zone de lungime fixa
+* SEGMENTAREA                         - tehnica de gestiune a memoriei virtuale care divide spatiul in zone de lungimi variabile
+* MEMORIE SRAM                        - memorie statica rapida care isi mentine informatia cat timp circuitul este alimentat
+* MEMORIE DRAM                        - memorie dinamica mai lenta si ieftina care necesita operatii periodice de regenerare

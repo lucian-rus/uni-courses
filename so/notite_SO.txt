@@ -1,0 +1,264 @@
+CAPITOLUL 1
+
+* ROLUL SI SCOPUL SISTEMELOR DE OPERARE
+    - sistemul de operare este intermediarul direct intre utilizator si hardware, comandand practic computerul.
+    - el controleaza hardware-ul si coordoneaza folosirea resurselor (procesor, memorie) de catre diverse aplicatii sau de catre utilizatori.
+    - rolul principal este furnizarea unui mediu de incredere in care programele sa functioneze.
+    - la calculatoarele personale (PC), obiectivul principal este usurinta in utilizare si maximizarea muncii.
+    - sistemul de operare este definit oficial ca un alocator de resurse care arbitreaza conflictele.
+    - se comporta ca un program de control care supravegheaza executia proceselor pentru a preveni erorile.
+
+* ORGANIZAREA UNUI SISTEM DE CALCUL
+    - din punct de vedere hardware, un sistem informatic contine unul sau mai multe procesoare (CPU) legate cu o magistrala (bus) comuna de controllerele de dispozitive.
+    - comunicarea sistemului de operare cu acest hardware se face mereu prin device driver.
+
+* MECANISMUL DE INTRERUPERI (INTERRUPTS)
+    - device driver-ul incarca comenzi in registrii controllerului, iar cand device-ul termina actiunea, alerteaza asincron procesorul.
+    - procesorul opreste ce facea, efectueaza procesarea evenimentului si isi reia sarcinile initiale.
+    - atat UNIX cat si Windows functioneaza pe baza unui vector de intreruperi (tabela care mapeaza semnalul la adresa rutinei de tratare).
+
+* STRUCTURA DE STOCARE SI IERARHIA MEMORIEI
+    - pentru instructiunile calculatorului se foloseste memoria principala (RAM), ce foloseste tehnologie DRAM volatila.
+    - startul calculatorului necesita un bootstrap program (boot loader) sa ruleze si sa incarce SO de pe disk in memorie (din EEPROM).
+    - sistemele au la baza arhitectura Von Neumann: preluarea intructiunii din memorie, decodarea, executia si stocarea rezultatului.
+    - memoria este ierarhizata dupa viteza si cost: registri, cache, RAM, urmate de storage-ul secundar (HDD, SSD).
+
+* DIRECT MEMORY ACCESS (DMA)
+    - DMA inlocuieste abordarea greoaie de a transfera date byte cu byte prin intreruperi.
+    - controller-ul dispozitivului incarca un volum intreg de date in memoria principala fara participarea constanta a procesorului.
+
+* MULTIPROGRAMARE SI MULTITASKING
+    - multiprogramarea incarca paralel software-urile simultan mentinand procesorul constant activ.
+    - in multitasking, se face o comutatie atat de deasa intre procese incat utilizatorul percepe un timp de raspuns instantaneu.
+
+* MODUL DUAL DE PROTECTIE (DUAL MODE)
+    - OS disociaza actiunile intre cele simple (User Mode) si cele cu executii complexe (Kernel Mode).
+    - tehnic, OS-ul foloseste un mode bit (0 pentru Kernel, 1 pentru User Mode).
+    - tranzitia se face adesea prin system calls care declanseaza trap-uri (intreruperi software).
+
+CAPITOLUL 2
+
+* SERVICIILE SISTEMULUI DE OPERARE
+    - SO ofera servicii esentiale: interfata cu utilizatorul (CLI, GUI), executia programelor, operatii I/O, manipularea sistemului de fisiere.
+    - asigura de asemenea comunicarea intre procese, detectia erorilor, alocarea resurselor si protectia/securitatea sistemului.
+
+* APELURI DE SISTEM (SYSTEM CALLS)
+    - reprezinta interfata de programare (API) pusa la dispozitie de SO aplicatiilor utilizator.
+    - in loc sa acceseze hardware-ul direct, programele invoca functii standardizate (ex: read(), write(), fork() in POSIX).
+    - parametrii catre apelurile de sistem se pot transmite prin registri, prin blocuri in memorie sau pe stiva.
+
+* LINKERE SI LOADERE
+    - codul sursa compilat devine un fisier obiect (object file).
+    - Linker-ul combina mai multe fisiere obiect si biblioteci intr-un singur fisier executabil, rezolvand adresele.
+    - Loader-ul este responsabil cu incarcarea fisierului executabil in memoria RAM pentru a fi lansat in executie de catre CPU.
+
+* STRUCTURA SISTEMULUI DE OPERARE
+    - structura monolitica: intregul SO ruleaza in spatiul kernel; este foarte rapid dar greu de intretinut si vulnerabil la crash-uri (ex: Linux traditional).
+    - microkernel: muta cat mai multe componente din kernel in user space; comunicarea se face prin transmitere de mesaje; este mai sigur dar are overhead de performanta (ex: Mach).
+    - module incarcabile (Loadable Kernel Modules - LKM): kernel-ul are functionalitati de baza dar poate incarca la runtime alte componente (ex: drivere), abordare hibrida intalnita in Linux modern si Windows.
+
+CAPITOLUL 3
+
+* CONCEPTUL DE PROCES
+    - procesul este un program aflat in executie (o entitate activa, spre deosebire de programul pasiv de pe disc).
+    - structura in memorie a unui proces include: Text section (codul executabil), Data section (variabile globale), Heap (memorie alocata dinamic) si Stack (parametrii functiilor, adrese de retur, variabile locale).
+
+* STARILE PROCESULUI
+    - New: procesul este in curs de creare.
+    - Ready: asteapta sa ii fie asignat un procesor.
+    - Running: instructiunile ii sunt executate de catre procesor.
+    - Waiting: procesul asteapta un eveniment (ex: terminarea unei operatii I/O).
+    - Terminated: a terminat executia si asteapta eliberarea resurselor.
+
+* BLOCUL DE CONTROL AL PROCESULUI (PCB)
+    - structura de date mentinuta de SO pentru fiecare proces.
+    - contine: starea procesului, program counter, registrii CPU, informatii de planificare, informatii despre memorie, contorizare si informatii de stare I/O.
+    - la context switch, SO salveaza starea in PCB-ul procesului curent si o incarca pe cea din PCB-ul procesului nou.
+
+* CREAREA SI TERMINAREA PROCESELOR
+    - in UNIX, crearea se face prin apelul fork() care creeaza un proces copil identic; acesta adesea invoca exec() pentru a inlocui spatiul sau de memorie cu un program nou.
+    - terminarea se face cu exit(); procesul parinte poate astepta terminarea copilului cu wait().
+    - un proces terminat al carui parinte nu a apelat wait() devine un proces "zombie".
+    - procesele orfane (al caror parinte a murit) sunt adoptate de procesul radacina (init / systemd).
+
+* COMUNICAREA INTRE PROCESE (IPC)
+    - necesara pentru ca procesele independente sa poata colabora.
+    - Shared Memory (memorie partajata): o zona de memorie este mapata atat in procesul A cat si in B; este foarte rapida dar necesita mecanisme de sincronizare; vezi cursul 6.
+    - Message Passing (transmitere de mesaje): mesajele sunt trimise prin SO (send si receive); este mai usor de implementat in retele dar mai lenta (overhead de system calls).
+
+CAPITOLUL 4
+
+* THREAD-URI (FIRE DE EXECUTIE)
+    - un thread reprezinta o unitate de baza a utilizarii procesorului, situata in interiorul unui proces.
+    - partajeaza cu celelalte thread-uri din acelasi proces: sectiunea text, datele si resursele SO (fisiere deschise).
+    - fiecare thread are propriul sau Thread ID, program counter, set de registri si stiva.
+    - principalul avantaj este timpul mic de raspuns, eficienta in alocarea resurselor si paralelizarea pe procesoare multicore.
+
+* PARALELISM VS CONCURENTA
+    - concurenta: sistemul creeaza iluzia executiei simultane progresand pe mai multe task-uri alternativ (pe un singur core).
+    - paralelism: sistemul chiar executa mai multe task-uri in acelasi timp pe core-uri fizice diferite.
+    - legea lui Amdahl descrie limita cresterii performantei in functie de procentul de componente strict secventiale.
+
+* MODELE DE MULTITHREADING
+    - Many-to-One: multe thread-uri user sunt mapate pe un singur thread kernel (daca unul face blocaj, se blocheaza tot).
+    - One-to-One: fiecare thread user are thread-ul lui de kernel (permite paralelism maxim dar consuma resurse mari, suportat de Linux/Windows).
+    - Many-to-Many: thread-urile utilizator sunt multiplexate pe un numar mai mic sau egal de thread-uri kernel.
+
+* THREAD POOLS
+    - crearea/distrugerea thread-urilor constant aduce overhead.
+    - solutia este pre-crearea unui numar limitat de thread-uri la pornirea aplicatiei care sunt asezate intr-un "pool" asteptand task-uri.
+    - aduce un control mult mai bun asupra numarului maxim de fire permise simultan si un timp de raspuns mai mic la primirea unei cereri.
+
+CAPITOLUL 5
+
+* PLANIFICAREA CPU (SCHEDULING)
+    - decizia sistemului de operare privind care proces aflat in coada "Ready" va primi acces la executie pe CPU.
+    - planificatorul pe termen scurt (CPU Scheduler) se executa foarte frecvent si trebuie sa fie extrem de rapid.
+    - Dispecerul (Dispatcher) este modulul care da efectiv controlul CPU-ului procesului selectat (face context switch, comuta modurile etc).
+
+* PREEMTIUNE SI NEPREEMTIUNE
+    - planificare nepreemptiva: procesul tine CPU-ul pana cand decide sa il elibereze (asteapta I/O sau se termina).
+    - planificare preemptiva: procesul poate fi fortat de SO sa intrerupa executia in favoarea altui proces mai important sau caruia ii vine randul (asigura raspunsuri mai bune dar necesita hardware cu timer).
+
+* CRITERII DE PLANIFICARE
+    - Throughput (debit): numarul de procese care isi termina executia pe unitatea de timp (se vrea maxim).
+    - Turnaround time (timp de executie): cat dureaza un proces de la initiere la terminare (se vrea minim).
+    - Waiting time (timp de asteptare): cat timp procesul a stat in coada Ready (se vrea minim).
+    - Response time (timp de raspuns): timpul scurs de la o cerere pana la primele caractere de output (se vrea minim).
+
+* ALGORITMI DE PLANIFICARE
+    - First-Come, First-Served (FCFS): simplu dar poate cauza "efectul de convoi" (un proces lung tine pe loc procesele scurte).
+    - Shortest-Job-First (SJF): optimizeaza media timpului de asteptare, executand procesul cu cel mai scurt burst de CPU, dar e greu de ghicit durata viitoare (se poate estima exponential).
+    - Round Robin (RR): fiecare proces primeste o cuanta fixa de timp de CPU; la expirare este preemptionat si trimis la capatul cozii (corect pentru timesharing).
+    - Planificare cu Prioritati: se executa mereu procesul cu prioritatea cea mai mare. Risca blocajul proceselor mici (starvation), solutia fiind "aging" (imbatranirea: cresterea treptata a prioritatii in timp).
+
+CAPITOLUL 6
+
+* CONDITII DE CONCURENTA (RACE CONDITIONS)
+    - apar cand mai multe procese manipuleaza concurent date partajate, iar rezultatul depinde de ordinea exacta in care se executa instructiunile.
+    - solutia impune implementarea unor mecanisme stricte de sincronizare.
+
+* SECTIUNEA CRITICA
+    - fragmentul de cod unde un proces acceseaza variabile modificate si de alte procese.
+    - o solutie corecta trebuie sa indeplineasca 3 conditii: Excluderea Mutuala (cand A este in sectiunea critica, B nu poate intra), Progresul (doar procesele care vor sa intre pot participa la luarea deciziei de acces) si Asteptarea Marginita (nu exista infometare, toata lumea prinde un rand).
+
+* MUTEX (MUTUAL EXCLUSION LOCKS)
+    - cel mai simplu instrument software de protectie: un lacat.
+    - procesul apeleaza acquire() (care blocheaza lacatul) inainte sa intre si release() (deblocheaza) la iesire.
+    - dezavantajul este "busy waiting" (daca lock-ul e blocat, procesul cicleaza pe procesor asteptand), de unde numele de "spinlock".
+
+* SEMAFOARE
+    - instrument mai robust propus de Dijkstra; un semafor este o variabila intreaga S.
+    - se acceseaza DOAR prin operatii atomice wait() (care scade valoarea, sau asteapta daca e zero) si signal() (care creste valoarea).
+    - semafoarele binare sunt echivalente cu Mutex-urile; cele de numarare (counting semaphores) se folosesc pentru a gestiona un numar limitat de instante ale unei resurse.
+
+* MONITOARE SI PROBLEME CLASICE DE SINCRONIZARE
+    - monitoarele sunt structuri de nivel inalt incluse in limbajele de programare (ex: keyword-ul synchronized din Java) care garanteaza ca un singur fir de executie are acces la metodele interne.
+    - problema Bounded-Buffer (producator-consumator): producatorul pune in buffer daca nu e plin, consumatorul ia daca nu e gol; rezolvata cu 2 semafoare pentru contorizare si un Mutex.
+    - problema Cititori-Scriitori: permite accesul concomitent la mai multi cititori, dar daca vine un scriitor, el are acces exclusiv; vezi cursul de sincronizare pentru implementarea favorizarii scriitorilor.
+
+CAPITOLUL 7
+
+* DEADLOCK (INTERBLOCARE)
+    - un impas in care fiecare proces dintr-un set asteapta un eveniment pe care numai un alt proces din acelasi set il poate declansa.
+
+* CONDITIILE LUI COFFMAN (CONDITII NECESARE PENTRU DEADLOCK)
+    - 1. Excludere mutuala: cel putin o resursa trebuie tinuta in mod nepartajat.
+    - 2. Hold and wait: un proces trebuie sa tina cel putin o resursa si sa astepte o alta tinuta de un alt proces.
+    - 3. Lipsa preemtiunii: resursele nu pot fi luate fortat; ele se elibereaza doar voluntar de procesul care le detine.
+    - 4. Asteptarea circulara: un set de procese {P0, P1...Pn} asteapta unul dupa altul in format de ciclu.
+
+* GRAFUL DE ALOCARE A RESURSELOR
+    - nodurile reprezinta procese (cercuri) si clase de resurse (dreptunghiuri); muchiile pot fi de cerere (Proces -> Resursa) sau alocare (Resursa -> Proces).
+    - absenta oricarui ciclu in graf garanteaza lipsa deadlock-urilor. Daca exista cicluri, e posibila interblocarea.
+
+* EVITAREA INTERBLOCARII (ALGORITMUL BANCHERULUI)
+    - necesita informatii a priori: fiecare proces trebuie sa declare din start numarul MAXIM din fiecare tip de resursa de care ar putea avea nevoie vreodata.
+    - algoritmul bancherului simuleaza alocarea ceruta; daca sistemul ajunge intr-o "stare sigura" (exista o secventa de onorare prin care toate isi pot termina task-ul), o aproba. Daca este o "stare nesigura", cererea procesului este pusa in asteptare.
+
+* PREVENIRE, DETECTIE SI RECUPERARE
+    - Prevenire: se limiteaza rigid modul in care apar conditiile Coffman (ex: ceri toate resursele la inceput ca sa spargi "hold and wait", ordonezi resursele numeric ca sa spargi "circular wait").
+    - Detectie: lasa sistemul sa intre in deadlock ocazional, ruleaza algoritmi periodici de cautare a ciclurilor.
+    - Recuperare: se poate abandona si omori fortat unul sau mai multe procese aflate in ciclu sau se face preemptie masiva la resurse (cu rollback).
+
+CAPITOLUL 8
+
+* MANAGEMENTUL MEMORIEI PRINCIPALE
+    - CPU nu poate adresa direct discul; toate instructiunile si datele trebuiesc aduse in RAM si in registri inainte sa fie procesate.
+    - protectia se asigura prin 2 registri hardware (Base register pentru adresa de inceput si Limit register pentru lungime); accesul dincolo de limite duce la un trap catre sistemul de operare.
+
+* ADRESARE LOGICA VS FIZICA
+    - adresa logica (virtuala): este generata de CPU in timpul executiei programului (ex: incepe de la 0).
+    - adresa fizica: este locatia reala din memoria chip-ului RAM.
+    - translatarea din logic in fizic se face la runtime (executie) de catre hardware-ul MMU (Memory Management Unit).
+
+* FRAGMENTAREA MEMORIEI
+    - la alocarea contigua apare "fragmentarea externa": in timp, spatiul liber din memorie se sparge in bucati mici, insumate au suficient loc dar nu sunt continue.
+    - "fragmentarea interna" apare cand se aloca unui proces mai mult decat cere strictul necesar (de exemplu spatiul ramas liber la sfarsitul unei pagini).
+
+* PAGINAREA (PAGING)
+    - solutia fundamentala impotriva fragmentarii externe. Memoria FIZICA este sparta in blocuri mici de dimensiune fixa = cadre (frames), iar memoria LOGICA in blocuri de aceeasi dimensiune = pagini (pages).
+    - procesul nu mai trebuie sa fie alocat contiguu. SO mentine o Tabela de Pagini (Page Table) pentru a traduce fiecare pagina in cadrul ei fizic.
+    - adresa logica generata de procesor are doua parti: Page Number (folosit ca index in Page Table) si Page Offset (pozitia in cadrul acelei pagini).
+
+* TLB (TRANSLATION LOOKASIDE BUFFER)
+    - Page Table sta tot in RAM, deci o cerere ar necesita 2 accese la RAM (unul pentru a afla translatia, altul pentru data).
+    - TLB este o memorie hardware cache foarte rapida situata in inima MMU-ului, care stocheaza traducerile recente (Page X = Frame Y).
+    - daca translatia este gasita (TLB Hit), merge instant spre RAM fizic; daca nu (TLB Miss), se acceseaza Tabela din RAM, se actualizeaza TLB-ul si continua.
+
+CAPITOLUL 9
+
+* MEMORIA VIRTUALA
+    - tehnica ce abstractizeaza memoria fizica, creand o iluzie de spatiu mult mai mare pentru programator; permite executia proceselor care nu se afla decat partial in memoria principala la un moment dat.
+    - avantaj imens: se pot rula zeci de aplicatii masive simuland pe HDD spatiu aditional.
+
+* DEMAND PAGING SI PAGE FAULTS
+    - o pagina este adusa din stocarea de masa (disk/swap) in RAM doar in secunda in care sistemul are o cerere imediata catre ea.
+    - daca CPU referentiaza o pagina a carei inregistrare in Page Table este marcata "invalid" (deci e pe disc, nu in RAM), hardware-ul da o exceptie denumita "Page Fault".
+    - la un Page Fault, SO gaseste un cadru liber in RAM, citeste pagina respectiva de pe disc prin I/O, actualizeaza Page Table pe "valid" si restarteaza exact instructiunea care a esuat.
+
+* INLOCUIREA PAGINILOR (PAGE REPLACEMENT)
+    - daca RAM-ul se umple, la un Page Fault, SO trebuie sa elibereze o pagina existenta mutand-o pe disk. Se doreste gasirea "victimei" ideale pentru a minimiza viitoarele Page Faults.
+    - FIFO (First-In-First-Out): o inlocuieste pe cea mai veche; sufera de anomalia lui Belady (adaugi mai mult RAM dar obtii mai multe page faults!).
+    - Optimal (OPT): inlocuieste pagina care nu va mai fi folosita cel mai mult timp in viitor (teoretic imposibil, util doar etalon pt simulari).
+    - LRU (Least Recently Used): inlocuieste pagina care nu a mai fost citita/modificata de cel mai mult timp (aproximare foarte des intalnita, implementata cu un stack sau biti de referinta hardware).
+
+* THRASHING
+    - fenomen distructiv: un proces isi pierde atat de mult timp prin a inlocui pagini non-stop de pe disk, incat nu mai realizeaza progres in procesor.
+    - se combate prin calcularea modelului Working-Set: SO monitorizeaza fix numarul paginilor care se acceseaza in ultimele Delta referinte si acorda acea memorie in mod garantat.
+
+CAPITOLUL 10
+
+* SISTEMUL DE FISIERE
+    - unitatea de stocare logica, abstracta creata de SO. Contine un ansamblu de date impreuna cu atribute esentiale (nume, identificator, tip, locatie pe disc, marime, permisiuni, times of access).
+    - operatiile standard includ: creare, citire, scriere, repozitionare (seek), stergere, truncare. Fisierele trebuiesc initial "deschise" (apel open) pastrandu-se datele la nivel SO intr-un tabel global "open-file table".
+
+* STRUCTURA DE DIRECTOARE
+    - colectia de noduri ce indica catre fisiere. Au evoluat de la directoare pe 1 nivel, pe 2 nivele, la directoare tip structura arborescenta generala.
+    - Unix/Linux foloseste i-node (Index Node) pentru fiecare fisier, stocand meta-datele (nu si numele), permitand link-uri hardware (hard links) multiple catre aceeasi data efectiva.
+
+* METODE DE ALOCARE PE DISC
+    - Alocarea Contigua: fiecare fisier ocupa un set continuu de blocuri de pe disc; ofera performanta maxima dar sufera ingrozitor de fragmentare externa (trebuie comprimat).
+    - Alocarea Inlantuita (Linked): blocurile sunt imprastiate, primul are un pointer spre al doilea etc; nu are fragmentare externa dar se navigheaza incet (merge prost la acces direct/random) - vezi structura FAT din MS-DOS care consolideaza toti pointerii intr-un tabel la inceput.
+    - Alocarea Indexata: aduce toti pointerii blocurilor intr-un singur bloc central al fisierului numit "index block"; perfect pt acces random. In UNIX, i-node-ul foloseste un index combinat (pointeri directi, indirect-simpli, indirect-dubli).
+
+CAPITOLUL 11
+
+* STRUCTURI DE STOCARE SI MASS-STORAGE
+    - discul magnetic traditional este incet mecanic (seek time pentru mutarea bratului + rotational latency pentru invartirea platanului). Viteza transferului logic primeaza in SO.
+    - SSD (Solid State Drives): tehnologie nevolatila superioara. Nu are timp de cautare mecanica dar se degradeaza in timp (necesita algoritmi pe controller de "wear leveling" ca sa uniformizeze uzura celulelor NAND pe viata).
+
+* SCHEDULING PE DISC (PLANIFICAREA DISCULUI HDD)
+    - datorita cererilor de citire a blocurilor de la adrese indepartate, SO ordoneaza cozile de citire pentru eficienta bratului mecanic.
+    - FCFS: prima servita. Sub-optima (se fataie tare bratul).
+    - SSTF (Shortest-Seek-Time-First): alege mereu urmatoarea cerere ca fiind cea mai aproape fizic de unde este bratul in prezent; poate duce la infometarea cererilor de la capete.
+    - SCAN (Algoritmul Liftului): bratul merge de la capat la capat, maturand in dublu-sens cererile.
+    - C-SCAN (Circular Scan): matura doar intr-o directie, sare rapid la start, mai uniform pentru asteptare.
+
+* RAID (REDUNDANT ARRAY OF INDEPENDENT DISKS)
+    - tehnica ce foloseste multiple discuri mici simultan combinat pentru siguranta si viteza sporita.
+    - RAID 0 (Striping): date sparte rapid pe ambele; viteza extrema dar fara nicio siguranta (pica unu, moare tot).
+    - RAID 1 (Mirroring/Oglinda): orice scrii pe discul 1 se scrie identic pe discul 2; pierzi 50% din bani dar ofera failover la defectiuni totale.
+    - RAID 5 (Striping cu paritate): datele si paritatea sunt distribuite matematic prin blocuri pe toate discurile din set; daca pica un disc, informatia poate fi reconstituita matematic prin citirea celor ramase. Cel mai eficient compromis in companii azi.
+    - RAID 10 sau 0+1: combina oglindirea cu vitezomania.
+

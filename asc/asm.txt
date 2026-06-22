@@ -1,0 +1,148 @@
+COMENZI DE ASAMBLARE ESENTIALE (INSTRUCTIUNI)
+* ADD        - aduna sursa la destinatie                                  ADD AX, BX
+* CBW        - converteste octet la cuvant prin extensie de semn          CBW
+* CMP        - compara doi operanzi scazandu-i fara a salva rezultatul    CMP CX, 5
+* CWD        - converteste cuvant la dublu cuvant in ax si dx             CWD
+* DEC        - scade unu din destinatie                                   DEC AL
+* DIV        - imparte fara semn acumulatorul la sursa                    DIV BL
+* INC        - aduna unu la destinatie                                    INC SI
+* JMP        - executa un salt neconditionat la o adresa                  JMP ETICHETA
+* JNE        - executa un salt conditionat daca nu este egal sau zero     JNE BUCLA
+* LEA        - incarca adresa efectiva in registru                        LEA DX, MESAJ
+* LOOP       - repeta o bucla scazand contorul cx pana cand devine zero   LOOP IAR
+* MOV        - copiaza valoarea sursei in destinatie                      MOV AX, @DATA
+* MUL        - inmulteste fara semn sursa cu acumulatorul                 MUL CX
+* POP        - extrage o valoare din varful stivei                        POP DX
+* PUSH       - salveaza o valoare in varful stivei                        PUSH AX
+* SHL        - deplaseaza logic bitii la stanga                           SHL BX, 1
+* SHR        - deplaseaza logic bitii la dreapta                          SHR AL, CL
+* SUB        - scade sursa din destinatie                                 SUB DX, 10
+* XCHG       - interschimba valorile intre sursa si destinatie            XCHG AL, AH
+
+DIRECTIVE SI PSEUDO-INSTRUCTIUNI FUNDAMENTALE
+* .CODE      - marcheaza inceputul segmentului de cod                     .CODE
+* .DATA      - marcheaza inceputul segmentului de date                    .DATA
+* .MODEL     - specifica modelul de memorie al programului                .MODEL SMALL
+* .STACK     - defineste segmentul si dimensiunea stivei                  .STACK 100H
+* DB         - defineste o variabila de tip byte pe un octet              VAR DB 10
+* DD         - defineste o variabila de tip double pe patru octeti        POINTER DD 0B8000000H
+* DW         - defineste o variabila de tip word pe doi octeti            NUMAR DW 1234H
+* END        - marcheaza sfarsitul programului sursa                      END START
+* ENDP       - marcheaza sfarsitul unei proceduri                         MAIN ENDP
+* EQU        - atribuie o expresie sau valoare numerica unui simbol       LUNGIME EQU 10
+* PROC       - defineste inceputul unei proceduri                         MAIN PROC
+
+INSTRUCTIUNI DE INTERACTIUNE FRECVENTE (INTRERUPERI)
+* INT 10H    - apeleaza serviciile video oferite de bios                  INT 10H
+* INT 21H    - apeleaza functiile sistemului de operare dos               INT 21H
+* AH = 01H   - citeste un caracter de la tastatura cu ecou                MOV AH, 01H
+* AH = 02H   - afiseaza un caracter pe ecran                              MOV AH, 02H
+* AH = 09H   - afiseaza un sir de caractere terminat cu dolar             MOV AH, 09H
+* AH = 4CH   - termina programul si reda controlul sistemului             MOV AH, 4CH
+
+ALTE COMENZI
+* AAM        - converteste la format zecimal neimpachetat                 AAM
+* ADC        - aduna cu valoarea bitului de transport                     ADC AX, BX
+* AND        - si logic pe biti                                           AND AL, 0FH
+* CALL       - apeleaza o procedura                                       CALL PROCEDURA
+* CLC        - sterge indicatorul de transport                            CLC
+* CLD        - sterge indicatorul de directie                             CLD
+* CWB        - instructiune de conversie                                  CWB
+* ENTER      - instructiune pentru limbaje structurate pe blocuri         ENTER 0, 0
+* ESC        - sincronizare cu evenimente externe                         ESC 0, AX
+* HLT        - opreste procesorul pana la o intrerupere externa           HLT
+* IMUL       - inmulteste cu semn                                         IMUL CX
+* INT        - genereaza o intrerupere software                           INT 21H
+* JC         - salt daca este transport                                   JC ETICHETA
+* JCXZ       - salt daca cx este zero                                     JCXZ ETICHETA
+* JG         - salt daca este mai mare                                    JG ETICHETA
+* JGE        - salt daca este mai mare sau egal                           JGE ETICHETA
+* JL         - salt daca este mai mic                                     JL ETICHETA
+* JNC        - salt daca nu este transport                                JNC ETICHETA
+* JNZ        - salt daca nu este zero                                     JNZ ETICHETA
+* LDS        - incarca adresa in ds si offset in registru                 LDS DX, PTR
+* LEAVE      - instructiune pentru limbaje structurate pe blocuri         LEAVE
+* LES        - incarca adresa in es si offset in registru                 LES DI, PTR
+* LODSB      - incarca un octet din sir in al                             LODSB
+* MOVS       - transfera date din sir in sir                              MOVS
+* MOVSW      - transfera un cuvant dintr-un sir in altul                  MOVSW
+* NEG        - neaga operandul schimbandu-i semnul                        NEG AX
+* NOT        - negare logica pe biti                                      NOT AL
+* OR         - sau logic pe biti                                          OR BL, 0FH
+* POPA       - extrage registrele generale de pe stiva                    POPA
+* PUSHA      - salveaza registrele generale pe stiva                      PUSHA
+* RCL        - rotire la stanga cu transport                              RCL AX, 1
+* REP        - repeta operatia pe sir cat timp cx diferit de zero         REP MOVSW
+* RET        - revine din apelul unei proceduri                           RET
+* ROL        - rotire la stanga                                           ROL AX, 1
+* ROR        - rotire la dreapta                                          ROR BX, CL
+* SAL        - deplasare aritmetica la stanga                             SAL AX, 1
+* SAR        - deplasare aritmetica la dreapta                            SAR BX, CL
+* STC        - seteaza indicatorul de transport                           STC
+* STD        - seteaza indicatorul de directie                            STD
+* WAIT       - sincronizare cu evenimente externe                         WAIT
+* XLAT       - transleaza un octet folosind o tabela                      XLAT TAB_CONV
+* XOR        - sau exclusiv logic pe biti                                 XOR AX, AX
+
+CONCEPTE INTRODUCTIVE SI FUNDAMENTE
+* LIMBAJUL MASINA             - singurul cod recunoscut si executat direct de procesor fiind compus exclusiv din secvente de biti
+* LIMBAJUL DE ASAMBLARE       - forma simbolica a limbajului masina ce foloseste mnemonice pentru a opera direct cu resursele hardware
+* ASAMBLORUL                  - program utilitar care traduce instructiunile mnemonice din codul sursa in secvente binare de cod masina
+* FISIERUL OBIECT             - rezultatul etapei de asamblare reprezentand traducerea codului sursa intr-un format binar intermediar
+* LINKEDITORUL                - utilitar care combina fisierele obiect cu biblioteci externe pentru a genera programul executabil final
+
+AVANTAJELE UTILIZARII LIMBAJULUI
+* VITEZA MAXIMA               - programele rezultate sunt extrem de rapide deoarece instructiunile sunt optimizate direct pentru procesor
+* SPATIU MINIM                - dimensiunea codului executabil este mult redusa in comparatie cu programele scrise in limbaje de nivel inalt
+* CONTROL ABSOLUT             - ofera programatorului un grad maxim de libertate in manipularea registrelor a memoriei si a intreruperilor
+* INTELEGERE HARDWARE         - faciliteaza asimilarea profunda a modului de functionare a microprocesorului la nivel arhitectural intern
+
+DEZAVANTAJELE UTILIZARII LIMBAJULUI
+* LIPSA PORTABILITATII        - codul este scris specific pentru o anumita familie de procesoare si nu poate fi rulat pe arhitecturi diferite
+* TIMP DE DEZVOLTARE          - scrierea unui program necesita mult mai mult efort atentie si timp comparativ cu limbajele de nivel inalt
+* DIFICULTATE LA DEPANARE     - procesul de identificare analiza si corectare a erorilor este mult mai complex laborios si predispus la greseli
+
+ARHITECTURA PROCESORULUI (RESURSE HARDWARE)
+* REGISTRELE GENERALE DE BAZA     - utilizate pentru calcule aritmetice, operatii de date si interactiuni cu porturile de intrare-iesire, putand fi accesate pe 16 biti sau pe 8 biti ca jumatati superioare si inferioare
+* REGISTRELE DE INDEX SI BAZA     - folosite pentru elaborarea adreselor si modurilor de adresare indirecta prin combinarea bazei cu indicii relativi
+* REGISTRELE DE SEGMENT           - registre pe 16 biti care retin adresele de start ale segmentelor fizice active din memoria sistemului
+* REGISTRELE DE STARE SI CONTROL  - registre speciale destinate urmaririi executiei instructiunilor si retinerii contextului curent al procesorului
+* AX (ACCUMULATOR REGISTER)       - registrul acumulator general utilizat prioritar in calcule matematice si operatii de intrare-iesire
+* BX (BASE REGISTER)              - registrul de baza ce poate fi utilizat atat pentru calcule generale cat si ca index in adresarea memoriei
+* CX (COUNT REGISTER)             - registrul numarator folosit automat ca si contor in instructiunile de ciclare, bucle software si deplasari pe biti
+* DX (DATA REGISTER)              - registrul de date utilizat in operatii de intrare-iesire si obligatoriu in operatiile de inmultire si impartire pe un cuvant
+* SP (STACK POINTER)              - indicatorul de stiva care contine adresa de offset a varfului curent al stivei sistemului
+* BP (BASE POINTER)               - indicatorul de baza folosit pentru accesarea si transferul datelor sau parametrilor direct in stiva
+* SI (SOURCE INDEX)               - registrul de index sursa utilizat in mod special in operatiile cu siruri de date pentru parcurgerea sursei
+* DI (DESTINATION INDEX)          - registrul de index destinatie utilizat in mod special in operatiile cu siruri de date pentru parcurgerea destinatiei
+* CS (CODE SEGMENT)               - selectorul de segment care retine adresa de inceput a segmentului ce contine codul sau programul activ
+* DS (DATA SEGMENT)               - selectorul de segment care retine adresa de inceput a segmentului ce contine variabilele si datele programului
+* SS (STACK SEGMENT)              - selectorul de segment care retine adresa de inceput a segmentului alocat pentru stiva sistemului
+* ES (EXTRA SEGMENT)              - selectorul de segment suplimentar utilizat in special ca destinatie in operatiile complexe cu siruri de date
+* IP (INSTRUCTION POINTER)        - pointerul de instructiuni care retine adresa de offset a urmatoarei instructiuni ce urmeaza a fi executata
+* REGISTRUL FLAGS                 - registrul de stare pe 16 biti format din biti individuali numiti flag-uri care indica rezultatul ultimei operatii sau controleaza executia
+* MSW (MACHINE STATUS WORD)       - cuvantul de stare a masinii care retine contextul de stare al procesorului pentru refacere in caz de eroare
+
+ORGANIZAREA MEMORIEI SI TIPURI DE DATE
+* ORGANIZAREA PE SEGMENTE         - memoria este structurata ca seturi de segmente liniare de lungime variabila de pana la 64 kb ale caror adrese fizice de start sunt multiplu de 16
+* ADRESA FIZICA                   - valoare numerica unica ce identifica in mod absolut o locatie de memorie in spatiul fizic de adresare al calculatorului
+* ADRESA LOGICA (SEGMENT:OFFSET)  - adresa utilizata de programator formata dintr-un selector de segment si un deplasament fata de inceputul segmentului respectiv
+* BIT                             - unitatea fundamentala si minima de stocare a informatiei reprezentata prin valorile binare zero sau unu
+* NIBBLE                          - grup de patru biti consecutivi utilizat in mod special pentru codificarea cifrelor in format zecimal codificat binar
+* BYTE (OCTET)                    - grup de opt biti definit prin directiva db care poate stoca un intreg de opt biti cu sau fara semn sau un caracter ascii
+* WORD (CUVANT)                   - grup de saisprezece biti sau doi octeti definit prin directiva dw reprezentand un intreg pe saisprezece biti sau o adresa
+* DOUBLE WORD (DUBLU CUVANT)      - grup de treizeci si doi de biti sau patru octeti definit prin directiva dd ce poate retine un intreg mare, un numar real sau o adresa far
+* QUAD WORD                       - grup de saizeci si patru de biti sau opt octeti definit prin directiva dq folosit pentru intregi pe 64 biti sau numere reale in dubla precizie
+* TEN-BYTES                       - structura de date de zece octeti definita prin directiva dt utilizata pentru reprezentari speciale pe un numar extins de biti
+* REGULA DE STOCARE IN MEMORIE    - principiul prin care datele ce depasesc un octet sunt fragmentate si dispuse la adrese succesive in functie de semnificatia octetilor
+
+FLUXUL DE LUCRU SI TOOLCHAIN-UL
+* EDITAREA CODULUI SURSA       - procesul de scriere a programului folosind un editor de texte pentru a genera documentul initial
+* ASAMBLAREA                   - translatarea fisierului sursa in cod masina pentru a genera un fisier obiect intermediar
+* EDITAREA DE LEGATURI         - combinarea fisierului obiect cu proceduri externe pentru a produce fisierul executabil final
+* EXECUTIA PROGRAMULUI         - incarcarea executabilului in memoria sistemului si predarea controlului catre procesor
+* DEPANAREA                    - rularea controlata a programului in regim pas cu pas pentru identificarea si corectarea erorilor
+* FISIERUL SURSA               - documentul text creat de programator care contine instructiunile scrise in limbaj de asamblare
+* FISIERUL OBIECT              - formatul binar intermediar obtinut in urma asamblarii codului sursa fara erori de sintaxa
+* FISIERUL EXECUTABIL          - produsul final complet rezultat dupa linkeditare care poate fi rulat de sistemul de operare
+* FISIERUL LISTING             - documentul optional generat de asamblor care ofera detalii tehnice despre procesul de asamblare
